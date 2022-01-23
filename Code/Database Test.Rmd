@@ -1,0 +1,2379 @@
+---
+title: "Database Test"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+#############################Setup######################################
+#install.packages("odbc")
+#install.packages("mongolite")
+library(devtools)
+library(odbc)
+library(mongolite)
+library(elasticsearchr)
+library(elastic)
+library(ggplot2)
+library(stringr)
+library(DescTools)
+library(reshape2)
+library(GGally)
+#devtools::install_github("alexioannides/elasticsearchr", force = TRUE)
+conn <- connect("elk.vpc.trinetx.com")
+
+xyz <- list()
+
+for (i in 1:12) {
+  if (i == 1) {
+    for (j in 1:31) {
+      if (j == 1) {
+        xyz <-
+          Search(conn,
+                 index = "queries-2019.01.01",
+                 q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+                 size = 10000)
+      }
+      else if (j < 10) {
+        temp_var <-
+          Search(
+            conn,
+            index = paste("queries-2019.01.0", as.character(j), sep = ""),
+            q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+            size = 10000
+          )
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+      else {
+        temp_var <-
+          Search(
+            conn,
+            index = paste("queries-2019.01.", as.character(j), sep = ""),
+            q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+            size = 10000
+          )
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+    }
+  }
+  else if (i == 2) {
+    for (j in 1:28) {
+      if (j == 1) {
+        temp_var <-
+          Search(conn,
+                 index = "queries-2019.02.01",
+                 q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+                 size = 10000)
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+      else if (j < 10) {
+        temp_var <-
+          Search(
+            conn,
+            index = paste("queries-2019.02.0", as.character(j), sep = ""),
+            q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+            size = 10000
+          )
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+      else {
+        temp_var <-
+          Search(
+            conn,
+            index = paste("queries-2019.02.", as.character(j), sep = ""),
+            q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+            size = 10000
+          )
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+    }
+  }
+  else if (i == 3) {
+    for (j in 1:31) {
+      if (j == 1) {
+        temp_var <-
+          Search(conn,
+                 index = "queries-2019.03.01",
+                 q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+                 size = 10000)
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+      else if (j < 10) {
+        temp_var <-
+          Search(
+            conn,
+            index = paste("queries-2019.03.0", as.character(j), sep = ""),
+            q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+            size = 10000
+          )
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+      else {
+        temp_var <-
+          Search(
+            conn,
+            index = paste("queries-2019.03.", as.character(j), sep = ""),
+            q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+            size = 10000
+          )
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+    }
+  }
+  else if (i == 4) {
+    for (j in 1:30) {
+      if (j == 1) {
+        temp_var <-
+          Search(conn,
+                 index = "queries-2019.04.01",
+                 q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+                 size = 10000)
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+      else if (j < 10) {
+        temp_var <-
+          Search(
+            conn,
+            index = paste("queries-2019.04.0", as.character(j), sep = ""),
+            q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+            size = 10000
+          )
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+      else {
+        temp_var <-
+          Search(
+            conn,
+            index = paste("queries-2019.04.", as.character(j), sep = ""),
+            q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+            size = 10000
+          )
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+    }
+  }
+  else if (i == 5) {
+    for (j in 1:31) {
+      if (j == 1) {
+        temp_var <-
+          Search(conn,
+                 index = "queries-2019.05.01",
+                 q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+                 size = 10000)
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+      else if (j < 10) {
+        temp_var <-
+          Search(
+            conn,
+            index = paste("queries-2019.05.0", as.character(j), sep = ""),
+            q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+            size = 10000
+          )
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+      else {
+        temp_var <-
+          Search(
+            conn,
+            index = paste("queries-2019.05.", as.character(j), sep = ""),
+            q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+            size = 10000
+          )
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+    }
+  }
+  else if (i == 6) {
+    for (j in 1:30) {
+      if (j == 1) {
+        temp_var <-
+          Search(conn,
+                 index = "queries-2019.06.01",
+                 q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+                 size = 10000)
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+      else if (j < 10) {
+        temp_var <-
+          Search(
+            conn,
+            index = paste("queries-2019.06.0", as.character(j), sep = ""),
+            q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+            size = 10000
+          )
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+      else {
+        temp_var <-
+          Search(
+            conn,
+            index = paste("queries-2019.06.", as.character(j), sep = ""),
+            q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+            size = 10000
+          )
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+    }
+  }
+  else if (i == 7) {
+    for (j in 1:31) {
+      if (j == 1) {
+        temp_var <-
+          Search(conn,
+                 index = "queries-2019.07.01",
+                 q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+                 size = 10000)
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+      else if (j < 10) {
+        temp_var <-
+          Search(
+            conn,
+            index = paste("queries-2019.07.0", as.character(j), sep = ""),
+            q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+            size = 10000
+          )
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+      else {
+        temp_var <-
+          Search(
+            conn,
+            index = paste("queries-2019.07.", as.character(j), sep = ""),
+            q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+            size = 10000
+          )
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+    }
+  }
+  else if (i == 8) {
+    for (j in 1:31) {
+      if (j == 1) {
+        temp_var <-
+          Search(conn,
+                 index = "queries-2019.08.01",
+                 q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+                 size = 10000)
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+      else if (j < 10) {
+        temp_var <-
+          Search(
+            conn,
+            index = paste("queries-2019.08.0", as.character(j), sep = ""),
+            q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+            size = 10000
+          )
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+      else {
+        temp_var <-
+          Search(
+            conn,
+            index = paste("queries-2019.08.", as.character(j), sep = ""),
+            q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+            size = 10000
+          )
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+    }
+  }
+  else if (i == 9) {
+    for (j in 1:30) {
+      if (j == 1) {
+        temp_var <-
+          Search(conn,
+                 index = "queries-2019.09.01",
+                 q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+                 size = 10000)
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+      else if (j < 10) {
+        temp_var <-
+          Search(
+            conn,
+            index = paste("queries-2019.09.0", as.character(j), sep = ""),
+            q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+            size = 10000
+          )
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+      else {
+        temp_var <-
+          Search(
+            conn,
+            index = paste("queries-2019.09.", as.character(j), sep = ""),
+            q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+            size = 10000
+          )
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+    }
+  }
+  else if (i == 10) {
+    for (j in 1:31) {
+      if (j == 1) {
+        temp_var <-
+          Search(conn,
+                 index = "queries-2019.10.01",
+                 q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+                 size = 10000)
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+      else if (j < 10) {
+        temp_var <-
+          Search(
+            conn,
+            index = paste("queries-2019.10.0", as.character(j), sep = ""),
+            q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+            size = 10000
+          )
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+      else {
+        temp_var <-
+          Search(
+            conn,
+            index = paste("queries-2019.10.", as.character(j), sep = ""),
+            q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+            size = 10000
+          )
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+    }
+  }
+  else if (i == 11) {
+    for (j in 1:30) {
+      if (j == 1) {
+        temp_var <-
+          Search(conn,
+                 index = "queries-2019.11.01",
+                 q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+                 size = 10000)
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+      else if (j < 10) {
+        temp_var <-
+          Search(
+            conn,
+            index = paste("queries-2019.11.0", as.character(j), sep = ""),
+            q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+            size = 10000
+          )
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+      else {
+        temp_var <-
+          Search(
+            conn,
+            index = paste("queries-2019.11.", as.character(j), sep = ""),
+            q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+            size = 10000
+          )
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+    }
+  }
+  else if (i == 12) {
+    for (j in 1:31) {
+      if (j == 1) {
+        temp_var <-
+          Search(conn,
+                 index = "queries-2019.12.01",
+                 q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+                 size = 10000)
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+      else if (j < 10) {
+        temp_var <-
+          Search(
+            conn,
+            index = paste("queries-2019.12.0", as.character(j), sep = ""),
+            q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+            size = 10000
+          )
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+      else {
+        temp_var <-
+          Search(
+            conn,
+            index = paste("queries-2019.12.", as.character(j), sep = ""),
+            q = "NOT(orgName:TriNetX*) AND type:query_statistics AND NOT(orgType:TriNetX)",
+            size = 10000
+          )
+        xyz[["hits"]][["hits"]] <-
+          c(xyz[["hits"]][["hits"]], temp_var[["hits"]][["hits"]])
+      }
+    }
+  }
+}
+
+si <- as.numeric(length(xyz[["hits"]][["hits"]]))
+
+
+
+
+med_org <-
+  data.frame(
+    "Org" = c(""),
+    "QStr" = c(""),
+    stringsAsFactors = FALSE
+  )
+
+for (i in 1:si) {
+  med_org <-
+    rbind(med_org, c(xyz[["hits"]][["hits"]][[i]][["_source"]][["orgType"]], xyz[["hits"]][["hits"]][[i]][["_source"]][["queryStr"]]))
+}
+
+
+
+med_org <- subset(med_org, Org != "")
+med_org <- subset(med_org, QStr != "{}")
+
+med_org <-
+  data.frame(lapply(med_org, function(x) {
+    gsub("\n", "", x)
+  }))
+
+med_org <-
+  data.frame(lapply(med_org, function(x) {
+    gsub("\"", "", x)
+  }))
+
+med_org <-
+  data.frame(lapply(med_org, function(x) {
+    gsub(" : ", "", x)
+  }))
+
+med_org <- data.frame(lapply(med_org, function(x)
+{
+  gsub("AND : \\[ \\]|AND\\[ \\]", "", x)
+}))
+
+med_org <- data.frame(lapply(med_org, function(x)
+{
+  gsub("OR : \\[ \\]|OR\\[ \\]", "", x)
+}))
+
+med_org <- data.frame(lapply(med_org, function(x)
+{
+  gsub("mustHave : \\{      \\}|mustHave\\{      \\}", "", x)
+}))
+
+med_org <- data.frame(lapply(med_org, function(x)
+{
+  gsub("cannotHave : \\{      \\}|cannotHave\\{      \\}", "", x)
+}))
+
+med_org_uni <- as.data.frame(med_org$Org)
+
+names(med_org_uni) <- c("Org")
+
+med_org_uni <- unique(med_org_uni)
+```
+
+```{r}
+#######################Code System types################################
+
+# org_listC <- list()
+# 
+# for(i in 1:nrow(med_org_uni)) {
+#   org_listC[i] <- med_org_uni$Org[i]
+#   names(org_listC)[i] <- med_org_uni$Org[i]
+# }
+# 
+# for(i in 1:nrow(med_org_uni)) {
+#   org_listC[[i]] <- as.list(org_listC[i])
+# }
+# 
+# 
+# only_code <- function(code_str) {
+#   code_str <- as.character(str_extract_all(code_str, "codeSystem[[:alnum:]]+"))
+#   code_str <- gsub("[[:punct:]]", "", code_str)
+#   code_str <- substr(gsub("codeSystem", "", code_str),
+#                      1, nchar(gsub("codeSystem", "", code_str)))
+#   code_str <- sub("c", "", code_str)
+# 
+#   return(code_str)
+# }
+# 
+# 
+# 
+# #
+# #
+# #THIS IS THE METHOD THAT TAKES FOREVER; MUST REFACTOR TO MAKE MORE EFFICIENT#
+# #
+# #
+# unique_frame <- function(org_name) {
+#   temp_org <- subset(med_org, Org == org_name)
+#   temp_org <- as.data.frame(temp_org$QStr)
+#   names(temp_org) <- c("QStr")
+# 
+# 
+#   temp_org <- data.frame(
+#     lapply(temp_org, function(x) { gsub("codeSystem", "codeSystem:", x)}))
+# 
+# 
+#   temp_org <- data.frame(lapply(temp_org, function(x) { gsub("\\:", "", x)}))
+# 
+#   temp_list <- list()
+# 
+# 
+# 
+#   for(i in 1:nrow(temp_org)) {
+#   temp_org$QStr[i] <- only_code(temp_org$QStr[i])
+# }
+#   temp_org_code <- data.frame("SystemName" = c(""), stringsAsFactors = FALSE)
+# 
+#   for(i in 1: nrow(temp_org)) {
+#     temp_org_code <- rbind(temp_org_code, c(strsplit(temp_org$QStr[i], split = " ")))
+#   }
+# 
+#   temp_org_code <-subset(temp_org_code, SystemName != "")
+# 
+#   temp_org_uni <- unique(temp_org_code)
+# 
+#   temp_num <- data.frame("timesAppeared" = 1:nrow(temp_org_uni))
+# 
+#   temp_org_uni <- cbind(temp_org_uni, temp_num)
+# 
+#   for(i in 1:nrow(temp_org_code)) {
+#     for(j in 1:nrow(temp_org_uni)) {
+#       if(temp_org_uni$SystemName[j] == temp_org_code$SystemName[i]) {
+#         temp_org_uni$timesAppeared[j] <- temp_org_uni$timesAppeared[j] + 1
+#       }
+#     }
+#   }
+# 
+#   for(i in 1:nrow(temp_org_uni)) {
+#     temp_list[i] <- temp_org_uni$timesAppeared[i]
+#     names(temp_list)[i] <- temp_org_uni$SystemName[i]
+#   }
+# 
+#   return(temp_list)
+# }
+# 
+# for(i in 1:nrow(med_org_uni)) {
+#   org_listC[[i]] <- unique_frame(org_listC[[i]][[1]])
+# }
+
+
+```
+
+```{r}
+####################And/Or statements###################################
+# org_listAO <- list()
+# 
+# for(i in 1:nrow(med_org_uni)) {
+#   org_listAO[i] <- med_org_uni$Org[i]
+#   names(org_listAO)[i] <- med_org_uni$Org[i]
+# }
+# 
+# for(i in 1:nrow(med_org_uni)) {
+#   org_listAO[[i]] <- as.list(org_listAO[i])
+# }
+# 
+# org_listAO[[1]][[1]] <- 1
+# names(org_listAO[[1]])[1] <- "AND"
+# org_listAO[[1]][[2]] <- 1
+# names(org_listAO[[1]])[2] <- "OR"
+# 
+# org_listAO[[2]][[1]] <- 1
+# names(org_listAO[[2]])[1] <- "AND"
+# org_listAO[[2]][[2]] <- 1
+# names(org_listAO[[2]])[2] <- "OR"
+# 
+# ao_frame <- function(org_name) {
+#   temp_org <- subset(med_org, Org == org_name)
+#   temp_org <- as.data.frame(temp_org$QStr)
+#   names(temp_org) <- c("QStr")
+# 
+# 
+#   temp_org <- cbind(temp_org, "And", "Or")
+# 
+#   names(temp_org)[2] <- "And"
+#   names(temp_org)[3] <- "Or"
+# 
+#   for(i in 1:nrow(temp_org)) {
+#     temp_org$And[i] <- str_count(temp_org$QStr[i], "AND")
+#     temp_org$Or[i] <- str_count(temp_org$QStr[i], "OR")
+#   }
+# 
+#   temp_list <- list()
+# 
+#   temp_list[[1]] <- sum(as.numeric(temp_org$And))
+#   temp_list[[2]] <- sum(as.numeric(temp_org$Or))
+# 
+#   return(temp_list)
+# 
+#   #names(org_listAO[[1]])[1]
+# }
+# 
+# org_listAO[[1]] <- ao_frame("Provider")
+# org_listAO[[2]] <- ao_frame("Pharma")
+# 
+# names(org_listAO[[1]])[1] <- "AND"
+# names(org_listAO[[1]])[2] <- "OR"
+# names(org_listAO[[2]])[1] <- "AND"
+# names(org_listAO[[2]])[2] <- "OR"
+# 
+# med_ao_frame <- data.frame("Org" = c(""), "OrTimes" = c(0), "AndTimes" = c(0), "Length" = c(0), stringsAsFactors = FALSE)
+# 
+# for (i in 1:nrow(med_org)) {
+#   med_ao_frame<- rbind(med_ao_frame, c(xyz[["hits"]][["hits"]][[i]][["_source"]][["orgType"]], str_count(xyz[["hits"]][["hits"]][[i]][["_source"]][["queryStr"]], "OR"),str_count(xyz[["hits"]][["hits"]][[i]][["_source"]][["queryStr"]], "AND"), str_length(xyz[["hits"]][["hits"]][[i]][["_source"]][["queryStr"]])))
+# }
+# 
+# med_ao_frame <-subset(med_ao_frame, Org != "")
+# med_ao_frame <- subset(med_ao_frame, Length != "2")
+# 
+# med_ao_frame <- cbind(med_ao_frame, "Summed")
+# names(med_ao_frame)[5] <- "Summed"
+# 
+# for(i in 1:nrow(med_ao_frame)) {
+#   med_ao_frame$Summed[i] <- as.numeric(med_ao_frame$AndTimes[i]) + as.numeric(med_ao_frame$OrTimes[i])
+# }
+
+```
+
+```{r}
+########################Must/CannotHave Statements######################
+# org_listMC <- list()
+# 
+# for(i in 1:nrow(med_org_uni)) {
+#   org_listMC[i] <- med_org_uni$Org[i]
+#   names(org_listMC)[i] <- med_org_uni$Org[i]
+# }
+# 
+# for(i in 1:nrow(med_org_uni)) {
+#   org_listMC[[i]] <- as.list(org_listMC[i])
+# }
+# 
+# org_listMC[[1]][[1]] <- 1
+# names(org_listMC[[1]])[1] <- "MustHave"
+# org_listMC[[1]][[2]] <- 1
+# names(org_listMC[[1]])[2] <- "CannotHave"
+# 
+# org_listMC[[2]][[1]] <- 1
+# names(org_listMC[[2]])[1] <- "MustHave"
+# org_listMC[[2]][[2]] <- 1
+# names(org_listMC[[2]])[2] <- "CannotHave"
+# 
+# 
+# mc_frame <- function(org_name) {
+#   temp_org <- subset(med_org, Org == org_name)
+#   temp_org <- as.data.frame(temp_org$QStr)
+#   names(temp_org) <- c("QStr")
+# 
+# 
+#   temp_org <- cbind(temp_org, "MustHave", "CannotHave")
+# 
+#   names(temp_org)[2] <- "MustHave"
+#   names(temp_org)[3] <- "CannotHave"
+# 
+#   for(i in 1:nrow(temp_org)) {
+#     temp_org$MustHave[i] <- str_count(temp_org$QStr[i], "mustHave")
+#     temp_org$CannotHave[i] <- str_count(temp_org$QStr[i], "cannotHave")
+#   }
+# 
+#   temp_list <- list()
+# 
+#   temp_list[[1]] <- sum(as.numeric(temp_org$MustHave))
+#   temp_list[[2]] <- sum(as.numeric(temp_org$CannotHave))
+# 
+#   return(temp_list)
+# 
+#   #names(org_listAO[[1]])[1]
+# }
+# 
+# org_listMC[[1]] <- mc_frame("Provider")
+# org_listMC[[2]] <- mc_frame("Pharma")
+# 
+# names(org_listMC[[1]])[1] <- "MustHave"
+# names(org_listMC[[1]])[2] <- "CannotHave"
+# names(org_listMC[[2]])[1] <- "MustHave"
+# names(org_listMC[[2]])[2] <- "CannotHave"
+# 
+# med_mc_frame <- data.frame("Org" = c(""), "CannotHave" = c(0), "MustHave" = c(0), "Length" = c(0), stringsAsFactors = FALSE)
+# 
+# for (i in 1:nrow(med_org)) {
+#   med_mc_frame<- rbind(med_mc_frame, c(med_org$Org[i], str_count(med_org$QStr[i], "cannotHave"),str_count(med_org$QStr[i], "mustHave"), str_length(med_org$QStr[i])))
+# }
+# 
+# 
+# med_mc_frame <-subset(med_mc_frame, Org != "")
+# 
+# for (i in 1:nrow(med_mc_frame)) {
+#   if(as.numeric(med_mc_frame$CannotHave[i]) > 0) {
+#     med_mc_frame$CannotHave[i] <- 1
+#   }
+#     if(as.numeric(med_mc_frame$MustHave[i]) > 0) {
+#     med_mc_frame$MustHave[i] <- 1
+#   }
+# }
+# 
+# med_mc_frame <- cbind(med_mc_frame, "Summed")
+# names(med_mc_frame)[5] <- "Summed"
+# 
+# for(i in 1:nrow(med_mc_frame)) {
+#   med_mc_frame$Summed[i] <- as.numeric(med_mc_frame$MustHave[i]) + as.numeric(med_mc_frame$CannotHave[i])
+# }
+```
+
+```{r}
+########################Chunk Complexity###############################
+
+
+med_org_cc <- med_org
+
+med_org_cc <- data.frame(lapply(med_org_cc, function(x)
+{
+  gsub("mustHave", "mustHave\\*MH\\*", x)
+}))
+
+med_org_cc <- data.frame(lapply(med_org_cc, function(x)
+{
+  gsub("cannotHave", "cannotHave\\*CH\\*", x)
+}))
+
+med_org_cc <- data.frame(lapply(med_org_cc, function(x)
+{
+  gsub("event\\[", "event\\*EVE\\*EVE\\*\\[", x)
+}))
+
+med_org_cc <- data.frame(lapply(med_org_cc, function(x)
+{
+  gsub("AND\\[", "AND\\*\\&\\*\\[", x)
+}))
+
+med_org_cc <- data.frame(lapply(med_org_cc, function(x)
+{
+  gsub("OR\\[", "OR\\*\\|\\*\\[", x)
+}))
+
+med_org_cc <- data.frame(lapply(med_org_cc, function(x)
+{
+  gsub("dates\\{", "dates\\*DAT\\*\\{", x)
+}))
+
+med_org_spl <- list()
+
+for (i in 1:nrow(med_org_cc)) {
+  med_org_spl[[i]] <-
+    data.frame(
+      str_split(
+        med_org_cc$QStr[i],
+        "mustHave|cannotHave|event\\*EVE|AND\\*|OR\\*|dates\\*"
+      )
+    )
+  names(med_org_spl[[i]]) <- "Word"
+  med_org_spl[[i]] <- subset(med_org_spl[[i]], Word != "")
+  med_org_spl[[i]] <- subset(med_org_spl[[i]], Word != ":")
+
+  med_org_spl[[i]] <-
+    data.frame(lapply(med_org_spl[[i]], function(x)
+    {
+      gsub("\\*MH\\*", "mustHave ", x)
+    }))
+
+  med_org_spl[[i]] <-
+    data.frame(lapply(med_org_spl[[i]], function(x)
+    {
+      gsub("\\*CH\\*", "cannotHave ", x)
+    }))
+
+  med_org_spl[[i]] <-
+    data.frame(lapply(med_org_spl[[i]], function(x)
+    {
+      gsub("\\*EVE\\*", "event", x)
+    }))
+
+  med_org_spl[[i]] <-
+    data.frame(lapply(med_org_spl[[i]], function(x)
+    {
+      gsub("\\&\\*", "AND ", x)
+    }))
+
+  med_org_spl[[i]] <-
+    data.frame(lapply(med_org_spl[[i]], function(x)
+    {
+      gsub("\\|\\*", "OR", x)
+    }))
+
+  med_org_spl[[i]] <-
+    data.frame(lapply(med_org_spl[[i]], function(x)
+    {
+      gsub("DAT\\*", "dates", x)
+    }))
+
+  numConcepts <-
+    data.frame("logic" = "aaa", "num" = c(1:nrow(med_org_spl[[i]])))
+
+  med_org_spl[[i]] <- cbind(med_org_spl[[i]], numConcepts)
+
+  for (j in 1:nrow(med_org_spl[[i]])) {
+    if (str_detect(med_org_spl[[i]]$Word[j], "event")) {
+      if (str_detect(med_org_spl[[i]]$Word[j], "dependentEvent")) {
+        med_org_spl[[i]]$logic[j] <- "dependentEvent"
+      }
+      else {
+        med_org_spl[[i]]$logic[j] <- "event"
+      }
+    }
+
+    if (str_detect(med_org_spl[[i]]$Word[j], "dates\\{")) {
+      if (str_detect(med_org_spl[[i]]$Word[j], "dependentEvent")) {
+        med_org_spl[[i]]$logic[j] <- "dependentEvent"
+      }
+      else {
+        if (str_detect(med_org_spl[[i]]$Word[j], "fixedRangefalse")
+            |
+            str_detect(med_org_spl[[i]]$Word[j], "startPeriod|endPeriod")) {
+          med_org_spl[[i]]$logic[j] <- "dates"
+        }
+        else {
+
+        }
+      }
+    }
+
+    if (str_detect(med_org_spl[[i]]$Word[j], "AND|OR")) {
+      if (str_detect(med_org_spl[[i]]$Word[j], "AND")
+          & !str_detect(med_org_spl[[i]]$Word[j], "OR")) {
+        med_org_spl[[i]]$logic[j] <- "AND"
+      }
+      else if (str_detect(med_org_spl[[i]]$Word[j], "OR")) {
+        med_org_spl[[i]]$logic[j] <- "OR"
+      }
+    }
+
+    if (str_detect(med_org_spl[[i]]$Word[j], "mustHave|cannotHave")) {
+      if (str_detect(med_org_spl[[i]]$Word[j], "mustHave")) {
+        med_org_spl[[i]]$logic[j] <- "mustHave"
+      }
+      else if (str_detect(med_org_spl[[i]]$Word[j], "cannotHave")) {
+        med_org_spl[[i]]$logic[j] <- "cannotHave"
+      }
+
+
+    }
+
+    if (str_count(med_org_spl[[i]]$Word[j], "displayName") >= str_count(med_org_spl[[i]]$Word[j], "codeSystem")) {
+      med_org_spl[[i]]$num[j] <-
+        str_count(med_org_spl[[i]]$Word[j], "displayName")
+    }
+    else {
+      med_org_spl[[i]]$num[j] <-
+        str_count(med_org_spl[[i]]$Word[j], "codeSystem")
+    }
+  }
+}
+
+for (i in 1:length(med_org_spl)) {
+  for (j in 1:nrow(med_org_spl[[i]])) {
+    if (med_org_spl[[i]]$logic[j] == "AND") {
+      k <- j + 1
+      l <- med_org_spl[[i]]$num[j]
+      while (k <= nrow(med_org_spl[[i]])
+             & med_org_spl[[i]]$logic[k] == "OR") {
+        l <- l + med_org_spl[[i]]$num[k]
+        k <- k + 1
+      }
+      med_org_spl[[i]]$num[j] <- l
+    }
+
+    else if (med_org_spl[[i]]$logic[j] == "OR") {
+      k <- j + 1
+      l <- med_org_spl[[i]]$num[j]
+      while (k <= nrow(med_org_spl[[i]])
+             & med_org_spl[[i]]$logic[k] == "AND") {
+        l <- l + med_org_spl[[i]]$num[k]
+        k <- k + 1
+      }
+      med_org_spl[[i]]$num[j] <- l
+    }
+  }
+}
+
+# med_org_ao <-
+#   data.frame(
+#     "numA" = c(1:length(med_org_spl)),
+#     "numO" = c(1:length(med_org_spl)),
+#     "numCA" = c(1:length(med_org_spl)),
+#     "numCO" = c(1:length(med_org_spl)),
+#     "avgA" = c(1:length(med_org_spl)),
+#     "avgO" = c(1:length(med_org_spl))
+#   )
+# 
+# for (i in 1:length(med_org_spl)) {
+#   med_org_ao$numA[i] <- sum(str_count(med_org_spl[[i]]$logic, "AND"))
+# 
+#   med_org_ao$numO[i] <- sum(str_count(med_org_spl[[i]]$logic, "OR"))
+# 
+#   med_org_ao$numCA[i] <-
+#     sum(filter(med_org_spl[[i]], logic == "AND")$num)
+# 
+#   med_org_ao$numCO[i] <-
+#     sum(filter(med_org_spl[[i]], logic == "OR")$num)
+# 
+#   if (is.nan(med_org_ao$numCA[i] / med_org_ao$numA[i])) {
+#     med_org_ao$avgA[i] <- 0.0
+#   }
+#   else {
+#     med_org_ao$avgA[i] <-
+#       as.double(as.double(med_org_ao$numCA[i]) / as.double(med_org_ao$numA[i]))
+#   }
+#   if (is.nan(med_org_ao$numCO[i] / med_org_ao$numO[i])) {
+#     med_org_ao$avgO[i] <- 0.0
+#   }
+#   else {
+#     med_org_ao$avgO[i] <-
+#       as.double(as.double(med_org_ao$numCO[i]) / as.double(med_org_ao$numO[i]))
+#   }
+# }
+
+```
+
+```{r}
+##########################Category function############################
+
+what_category <- function(conName) {
+  if (conName == "CPT"
+      | conName == "HCPCS"
+      | conName == "ICD10PCS"
+      | conName == "Treatment") {
+    return("Procedure")
+  }
+  else if (conName == "Findings"
+           | conName == "LOINC"
+           | conName == "TNX:LAB") {
+    return("Labs")
+  }
+  else if (conName == "GENOMIC") {
+    return("Genomic")
+  }
+  else if (conName == "HL7V3"
+           | conName == "TriNetX"
+           | conName == "Age"
+           | conName == "Male"
+           | conName == "Female") {
+    return("Demographics")
+  }
+  else if (conName == "ICD10CM") {
+    return("Diagnoses")
+  }
+  else if (conName == "ICD9CM") {
+    return("ICD-9")
+  }
+  else if (conName == "RXNorm"
+           | conName == "VA"
+           | conName == "RXNORM") {
+    return("Medication")
+  }
+  else if (conName == "Visit") {
+    return("Visits")
+  }
+  else if (conName == "Vitals") {
+    return("Vitals")
+  }
+  else {
+    return("Other")
+  }
+}
+```
+
+```{r}
+###########################Metrics#####################################
+
+med_org_met <- med_org_spl
+
+for (i in 1:length(med_org_met)) {
+  med_org_met[[i]][[1]] <- med_org_met[[i]]
+  med_org_met[[i]][[3]] <- NULL
+  med_org_met[[i]][[2]] <- NULL
+  
+  med_org_met[[i]] <- as.list(med_org_met[[i]])
+}
+
+for (i in 1:length(med_org_met)) {
+  presence_met <-
+    data.frame(
+      "mustHave" = c(FALSE),
+      "cannotHave" = c(FALSE),
+      "indEvents" = c(0),
+      "dependentEvents" = c(0)
+    )
+  mh_log_met <-
+    data.frame(
+      "AND" = c(0),
+      "totCon" = c(0),
+      "OR" = c(0),
+      "orCon" = c(0),
+      "avgOC" = c(0),
+      "passed" = c(FALSE)
+    )
+  ch_log_met <-
+    data.frame(
+      "OR" = c(0),
+      "totCon" = c(0),
+      "AND" = c(0),
+      "andCon" = c(0),
+      "avgAC" = c(0),
+      "passed" = c(FALSE)
+    )
+  global_met <-
+    data.frame(
+      "conName" = "aaa",
+      "conCat" = "bbb",
+      "numCon" = c(1:3000),
+      "queryNum" = c(i)
+    )
+  qual_met <-
+    data.frame(
+      "qualCon" = "aaa",
+      "qualCat" = "bbb",
+      "numQual" = c(1:3000),
+      "queryNum" = c(i)
+    )
+  
+  med_org_met[[i]][[2]] <- presence_met
+  med_org_met[[i]][[3]] <- mh_log_met
+  med_org_met[[i]][[4]] <- ch_log_met
+  med_org_met[[i]][[5]] <- global_met
+  med_org_met[[i]][[6]] <- qual_met
+  
+  for (j in 1:nrow(med_org_met[[i]][[1]])) {
+    if (med_org_met[[i]][[1]]$logic[j] == "dates") {
+      med_org_met[[i]][[2]]$indEvents <-
+        med_org_met[[i]][[2]]$indEvents + 1
+    }
+    else if (med_org_met[[i]][[1]]$logic[j] == "dependentEvent") {
+      med_org_met[[i]][[2]]$dependentEvents <-
+        med_org_met[[i]][[2]]$dependentEvents + 1
+      med_org_met[[i]][[2]]$indEvents <-
+        med_org_met[[i]][[2]]$indEvents + 1
+    }
+    else if (med_org_met[[i]][[1]]$logic[j] == "mustHave"
+             & !med_org_met[[i]][[2]]$mustHave) {
+      for (k in 1:j) {
+        if (med_org_met[[i]][[1]]$logic[k] == "dates"
+            | med_org_met[[i]][[1]]$logic[k] == "dependentEvent") {
+          med_org_met[[i]][[2]]$mustHave <- FALSE
+          # med_org_met[[i]][[3]] <- data.frame("AND" = c(0), "andCon" = c(0), "avgAC" = c(0), "passed" = c(FALSE))
+          break
+        }
+        else {
+          med_org_met[[i]][[2]]$mustHave <- TRUE
+        }
+      }
+      if (med_org_met[[i]][[2]]$mustHave) {
+        n <- j
+        while (n <= nrow(med_org_met[[i]][[1]])
+               & !med_org_met[[i]][[3]]$passed) {
+          if (med_org_met[[i]][[1]]$logic[n] == "AND") {
+            med_org_met[[i]][[3]]$AND <- med_org_met[[i]][[3]]$AND + 1
+            med_org_met[[i]][[3]]$totCon <-
+              med_org_met[[i]][[3]]$totCon + med_org_met[[i]][[1]]$num[n]
+          }
+          else if (med_org_met[[i]][[1]]$logic[n] == "OR") {
+            med_org_met[[i]][[3]]$OR <- med_org_met[[i]][[3]]$OR + 1
+            med_org_met[[i]][[3]]$orCon <-
+              med_org_met[[i]][[3]]$orCon + med_org_met[[i]][[1]]$num[n]
+          }
+          else if (med_org_met[[i]][[1]]$logic[n] == "cannotHave"
+                   | med_org_met[[i]][[1]]$logic[n] == "event") {
+            med_org_met[[i]][[3]]$passed <- TRUE
+          }
+          n <- n + 1
+        }
+      }
+    }
+    else if (med_org_met[[i]][[1]]$logic[j] == "cannotHave"
+             & !med_org_met[[i]][[2]]$cannotHave) {
+      for (k in 1:j) {
+        if (med_org_met[[i]][[1]]$logic[k] == "dates"
+            | med_org_met[[i]][[1]]$logic[k] == "dependentEvent") {
+          med_org_met[[i]][[2]]$cannotHave <- FALSE
+          break
+        }
+        else {
+          med_org_met[[i]][[2]]$cannotHave <- TRUE
+        }
+      }
+      if (med_org_met[[i]][[2]]$cannotHave) {
+        n <- j
+        while (n <= nrow(med_org_met[[i]][[1]])
+               & !med_org_met[[i]][[4]]$passed) {
+          if (med_org_met[[i]][[1]]$logic[n] == "OR") {
+            med_org_met[[i]][[4]]$OR <- med_org_met[[i]][[4]]$OR + 1
+            med_org_met[[i]][[4]]$totCon <-
+              med_org_met[[i]][[4]]$totCon + med_org_met[[i]][[1]]$num[n]
+          }
+          else if (med_org_met[[i]][[1]]$logic[n] == "AND") {
+            med_org_met[[i]][[4]]$AND <- med_org_met[[i]][[4]]$AND + 1
+            med_org_met[[i]][[4]]$andCon <-
+              med_org_met[[i]][[4]]$andCon + med_org_met[[i]][[1]]$num[n]
+          }
+          else if (med_org_met[[i]][[1]]$logic[n] == "event") {
+            med_org_met[[i]][[4]]$passed <- TRUE
+          }
+          n <- n + 1
+        }
+      }
+    }
+  }
+  
+  tempES <- as.data.frame(unlist(
+    str_extract_all(
+      med_org_met[[i]][[1]]$Word,
+      "codeSystem[[:alnum:]]+:[[:alnum:]]+|codeSystem[[:alnum:]]+|displayNameAge|displayNameMale[[:blank:]]\\W|displayNameFemale[[:blank:]]\\W"
+    )
+  ))
+  
+  tempEV <- as.data.frame(unlist(
+    str_extract_all(
+      med_org_met[[i]][[1]]$Word,
+      "codeSystem[[:graph:]]+[[:blank:]]+value<=|codeSystem[[:graph:]]+[[:blank:]]+value>=|codeSystem[[:graph:]]+[[:blank:]]+value BETWEEN|\\{[[:blank:]]+value>=|\\{[[:blank:]]+value<=|\\{[[:blank:]]+value BETWEEN"
+    )
+  ))
+  
+  names(tempES) <- "conName"
+  
+  names(tempEV) <- "qualCon"
+  
+  if (nrow(tempES) != 0) {
+    med_org_met[[i]][[5]]$conName[1:nrow(tempES)] <- tempES$conName
+    
+    med_org_met[[i]][[5]] <-
+      subset(med_org_met[[i]][[5]], conName != "aaa")
+    
+    med_org_met[[i]][[5]]$conName[1:length(unique(med_org_met[[i]][[5]]$conName))] <-
+      unique(med_org_met[[i]][[5]]$conName)
+    
+    med_org_met[[i]][[5]] <-
+      med_org_met[[i]][[5]][1:length(unique(tempES$conName)),]
+    
+    med_org_met[[i]][[5]]$conName <-
+      melt(lapply(med_org_met[[i]][[5]]$conName, function(x) {
+        gsub("codeSystem|displayName", "", x)
+      }))$value
+    
+    for (j in 1:nrow(med_org_met[[i]][[5]])) {
+      if (str_trim(med_org_met[[i]][[5]]$conName[j]) == "Male"
+          |
+          str_trim(med_org_met[[i]][[5]]$conName[j]) == "Female")
+      {
+        med_org_met[[i]][[5]]$conName[j] <-
+          str_trim(med_org_met[[i]][[5]]$conName[j])
+      }
+      if (med_org_met[[i]][[5]]$conName[j] == "Age"
+          | med_org_met[[i]][[5]]$conName[j] == "Male"
+          | med_org_met[[i]][[5]]$conName[j] == "Female") {
+        med_org_met[[i]][[5]]$numCon[j] <-
+          nrow(subset(tempES,
+                      str_detect(
+                        conName,
+                        paste("displayName", med_org_met[[i]][[5]]$conName[j], sep = "")
+                      )))
+      }
+      else {
+        med_org_met[[i]][[5]]$numCon[j] <-
+          nrow(subset(
+            tempES,
+            conName == paste("codeSystem", med_org_met[[i]][[5]]$conName[j], sep = "")
+          ))
+      }
+      med_org_met[[i]][[5]]$conCat[j] <-
+        what_category(med_org_met[[i]][[5]]$conName[j])
+    }
+    
+  }
+  else {
+    med_org_met[[i]][[5]] <-     data.frame("conName" = "None",
+                                            "conCat" = "None",
+                                            "numCon" = c(0),
+                                            "queryNum" = c(i))
+  }
+  
+  if (nrow(tempEV) != 0) {
+    med_org_met[[i]][[6]]$qualCon[1:nrow(tempEV)] <- tempEV$qualCon
+    
+    med_org_met[[i]][[6]] <-
+      subset(med_org_met[[i]][[6]], qualCon != "aaa")
+    
+    for (j in 1:nrow(med_org_met[[i]][[6]])) {
+      if (!str_detect(med_org_met[[i]][[6]]$qualCon[j], "codeSystem")) {
+        med_org_met[[i]][[6]]$qualCon[j] <- "Age"
+      }
+      else if (str_detect(med_org_met[[i]][[6]]$qualCon[j], "codeSystemTNX:LAB")) {
+        med_org_met[[i]][[6]]$qualCon[j] <- "TNX:LAB"
+      }
+      else {
+        med_org_met[[i]][[6]]$qualCon[j] <-
+          str_extract(med_org_met[[i]][[6]]$qualCon[j], "codeSystem[[:alnum:]]+")
+        med_org_met[[i]][[6]]$qualCon[j] <-
+          str_extract(med_org_met[[i]][[6]]$qualCon[j], "[^codeSystem][[:alnum:]]+")
+      }
+      
+      med_org_met[[i]][[6]]$qualCat[j] <-
+        what_category(med_org_met[[i]][[6]]$qualCon[j])
+      
+      med_org_met[[i]][[6]]$numQual[j] <- 1
+    }
+    
+    
+  }
+  else {
+    med_org_met[[i]][[6]] <- data.frame(
+      "qualCon" = "None",
+      "qualCat" = "None",
+      "numQual" = c(0),
+      "queryNum" = c(i)
+    )
+  }
+}
+
+for (i in 1:length(med_org_met)) {
+  if (is.nan(med_org_met[[i]][[3]]$orCon / med_org_met[[i]][[3]]$OR)) {
+    med_org_met[[i]][[3]]$avgOC <- 0.0
+  }
+  else {
+    med_org_met[[i]][[3]]$avgOC <-
+      as.double(as.double(med_org_met[[i]][[3]]$orCon) / as.double(med_org_met[[i]][[3]]$OR))
+  }
+  
+  if (is.nan(med_org_met[[i]][[4]]$andCon / med_org_met[[i]][[4]]$AND)) {
+    med_org_met[[i]][[4]]$avgAC <- 0.0
+  }
+  else {
+    med_org_met[[i]][[4]]$avgAC <-
+      as.double(as.double(med_org_met[[i]][[4]]$andCon) / as.double(med_org_met[[i]][[4]]$AND))
+  }
+}
+
+```
+
+```{r}
+########################Charts/Graphs##################################
+#
+# org_list1000 <- org_listC
+########this is with 11 organizations, with a sample size of 2000 queries, because I can't keep running that many queries on this machine###############
+
+#
+#
+#the limitation of lists is that I cannot use the ggplot2 package directly with a list; it must be converted to a data frame
+#
+#
+
+# melted_org_list <- melt(org_list1000)
+# melted_org_list <- data.frame(lapply(melted_org_list, function(x) { gsub("\n", "", x)}))
+# 
+# names(melted_org_list) <- c("numTimes", "CodeSystem", "Org")
+# 
+# melted_org_list$numTimes <- as.numeric(melted_org_list$numTimes)
+# 
+# melted_org_list <- melted_org_list %>% group_by(Org, CodeSystem) %>% summarise_each(funs(sum))
+# 
+# melted_org_list <- subset(melted_org_list, CodeSystem != "haracter0")
+# 
+# rowPharm <- nrow(subset(med_org, Org == "Pharma"))
+# rowProv <- nrow(subset(med_org, Org == "Provider"))
+# 
+# addSmallLegend <- function(myPlot, textSize = 10, spaceLegend = 0.8) {
+#     myPlot +
+#         theme(legend.title = element_text(size = textSize),
+#               legend.text  = element_text(size = textSize),
+#               legend.key.size = unit(spaceLegend, "lines"))
+# }
+# 
+# g4 <- ggplot(melted_org_list,
+#              aes(
+#                x = Org,
+#                y = numTimes / sum(melted_org_list$numTimes),
+#                fill = CodeSystem,
+#                width = 0.9 *
+#                  (as.numeric(nrow(
+#                    subset(med_org, Org == Org)
+#                  )) / as.numeric(NROW(med_org)))
+#              )) + geom_bar(stat = "identity")
+# 
+#  addSmallLegend(g4)
+# 
+# plot(g4)
+# 
+# org_list1002 <- org_listAO
+# 
+# melted_org_list2 <- melt(org_list1002)
+# 
+# names(melted_org_list2) <- c("numTimes", "logic", "Org")
+# 
+# g5 <- ggplot(melted_org_list2,
+#              aes(
+#                x = Org,
+#                y = numTimes / sum(melted_org_list2$numTimes),
+#                fill = logic,
+#                width = 0.9 *
+#                  (as.numeric(nrow(
+#                    subset(med_org, Org == Org)
+#                  )) / as.numeric(NROW(med_org)))
+#              )) + geom_bar(stat = "identity")
+# 
+# plot(g5)
+# 
+# #this is the best non bar chart I could do with this data
+# g6 <- ggplot(med_ao_frame, aes(Org, as.numeric(Summed))) + geom_point()
+# 
+# plot(g6)
+# 
+# 
+# org_list1003 <- org_listMC
+# 
+# melted_org_list3 <- melt(org_list1003)
+# 
+# names(melted_org_list3) <- c("numTimes", "type", "Org")
+# 
+# g7 <- ggplot(melted_org_list3,
+#              aes(
+#                x = Org,
+#                y = numTimes / sum(melted_org_list3$numTimes),
+#                fill = type,
+#                width = 0.9 *
+#                  (as.numeric(nrow(
+#                    subset(med_org, Org == Org)
+#                  )) / as.numeric(NROW(med_org)))
+#              )) + geom_bar(stat = "identity")
+# 
+# plot(g7)
+# 
+# g8 <- ggplot(med_mc_frame, aes(Org, as.numeric(CannotHave))) + geom_count() + scale_size(range = c(5, 8))
+# 
+# plot(g8)
+# 
+# g9 <- ggplot(med_mc_frame, aes(Org, as.numeric(MustHave))) + geom_count() + scale_size(range = c(5, 8))
+# 
+# plot(g9)
+# 
+# 
+# #at lower numbers of AND statements, there is a large distribution of concepts in each query; curious if this holds up when a large (talking 500,000+) amount of queries are fed into the code; I would expect to see a larger range at the top of this same type of chart
+# g10 <- ggplot(med_org_ao, aes(numCA, numA)) + geom_violin(scale = "area")# + coord_cartesian(ylim = c(1, 30)) + scale_y_continuous(limits = c(1, 30))
+# 
+# plot(g10)
+# 
+# #refer to plots g5 and g7
+# #there seems to be a higher distribution of concepts in OR queries; this could be for a variety of reasons, such as the fact that TNX live users may prefer to be more general with their queries; or the fact that there are more OR statements total in the queries being pulled (referring to plot g5)
+# #this does not reconcile with the fact that mustHave statements are used more overall (referring to plot g7), and the default logic for mustHave is AND
+# g11 <- ggplot(med_org_ao, aes(numCO, numO)) + geom_violin(scale = "area")# + coord_cartesian(ylim = c(1, 30)) + scale_y_continuous(limits = c(1, 30))
+# 
+# plot(g11)
+# 
+# #you can get an outline of the density of the relationship between the number of concepts and the number of and statements; looking at g12, nearly every dot from a 1 AND statement:1 Concept, all the way up to 5 AND statements:100 concepts, is filled
+# g12 <- ggplot(med_org_ao, aes(numCA, numA)) + geom_point() #+ scale_y_continuous(limits = c(1, 12.5)) + scale_x_continuous(limits = c(1, 30)) 
+# 
+# plot(g12)
+# 
+# #looking at g13, you can see how there's also a very large amount of queries with only 1 or so concepts, which does back up plot g10
+# g13 <- ggplot(med_org_ao, aes(numCA, numA)) + geom_count() #+ scale_y_continuous(limits = c(1, 12.5)) + scale_x_continuous(limits = c(1, 30))
+# 
+# plot(g13)
+# 
+# 
+# g14 <- ggplot(med_org_ao, aes(numCO, numO)) + geom_point() #+ scale_y_continuous(limits = c(1, 12.5)) + scale_x_continuous(limits = c(1, 30)) 
+# 
+# plot(g14)
+# 
+# #backing up g11, you can see how there is a much wider range of the number of concepts in OR statements
+# g15 <- ggplot(med_org_ao, aes(numCO, numO)) + geom_count() #+ scale_y_continuous(limits = c(1, 12.5)) + scale_x_continuous(limits = c(1, 30))
+# 
+# plot(g15)
+# 
+# 
+# org_list1004 <- list()
+# 
+# for(i in 1:length(med_org_met)) {
+#   org_list1004[[i]] <- med_org_met[[i]][[2]]
+# }
+# 
+# org_frame1004 <- data.frame("mustHave" = c(FALSE), "cannotHave" = c(FALSE), "indEvents" = c(1:length(org_list1004)), "dependentEvents" = c(1:length(org_list1004)))
+# 
+# for(i in 1:nrow(org_frame1004)) {
+#   org_frame1004$mustHave[i] <- org_list1004[[i]]$mustHave
+#   org_frame1004$cannotHave[i] <- org_list1004[[i]]$cannotHave
+#   org_frame1004$indEvents[i] <- org_list1004[[i]]$indEvents
+#   org_frame1004$dependentEvents[i] <- org_list1004[[i]]$dependentEvents
+# }
+# 
+# 
+# g16 <- ggplot(org_frame1004, aes(indEvents)) + geom_histogram(binwidth = 1)
+# 
+# plot(g16)
+# 
+# g17 <- ggplot(org_frame1004, aes(dependentEvents)) + geom_histogram(binwidth = 1)
+# 
+# plot(g17)
+# 
+# #For scoring independent event presence: 0 to 2: if there is an independent event, automatic score of 1; anything more than that, it is as 1 + ((number of events in the query - 1) ÷ (the number of events in the query with the most events compared to all others - 1))
+# 
+# org_frame1005 <- data.frame()
+# 
+# ind_score <- data.frame("indScore" = (1:nrow(org_frame1004)))
+# 
+# org_frame1005 <- cbind(org_frame1004, ind_score)
+# 
+# for(i in 1:nrow(org_frame1005)) {
+#   if(org_frame1005$indEvents[i] == 0) {
+#     org_frame1005$indScore[i] <- 0.0
+#   }
+#   else if(org_frame1005$indEvents[i] == 1) {
+#     org_frame1005$indScore[i] <- 1.0
+#   }
+#   else {
+#     org_frame1005$indScore[i] <- 1.0 + as.double(as.double(as.double(org_frame1005$indEvents[i]) - 1.0) / as.double(as.double(fivenum(org_frame1004$indEvents)[5]) - 1.0))
+#   }
+# }
+# 
+# g18 <- ggplot(org_frame1005, aes(indScore)) + geom_histogram(binwidth = 0.1)
+# 
+# plot(g18)
+# 
+# #For scoring dependent event presence: 0 to 2: if there is an dependent event, automatic score of 1; anything more than that, it is as 1 +  ((number of events in the query - 1) ÷ ((the number of events in the query with the most events compared to all others - 1) / 2))
+# 
+# dep_score <- data.frame("depScore" = (1:nrow(org_frame1005)))
+# 
+# org_frame1005 <- cbind(org_frame1005, dep_score)
+# 
+# for(i in 1:nrow(org_frame1005)) {
+#   if(org_frame1005$dependentEvents[i] == 0) {
+#     org_frame1005$depScore[i] <- 0.0
+#   }
+#   else if(org_frame1005$depScore[i] == 1) {
+#     org_frame1005$indScore[i] <- 1.0
+#   }
+#   else {
+#     org_frame1005$depScore[i] <- 1.0 + as.double(as.double(as.double(org_frame1005$indEvents[i]) - 1.0) / (as.double(as.double(fivenum(org_frame1004$indEvents)[5]) - 1.0) / 2.0))
+#   }
+# 
+#   if(org_frame1005$depScore[i] > 2) {
+#     org_frame1005$depScore[i] <- 2.0
+#   }
+# }
+# 
+# g19 <- ggplot(org_frame1005, aes(depScore)) + geom_histogram(binwidth = 0.2)
+# 
+# plot(g19)
+# 
+# #
+# ###must have ------------------------------------------
+# #
+# 
+# org_list1006 <- list()
+# 
+# for(i in 1:length(med_org_met)) {
+#   org_list1006[[i]] <- med_org_met[[i]][[3]]
+# }
+# 
+# org_frame1006 <- data.frame("AND" = c(1:length(org_list1006)), "totCon" = c(1:length(org_list1006)),"OR" = c(1:length(org_list1006)), "orCon" = c(1:length(org_list1006)), "avgOC" = c(1:length(org_list1006)), "passed" = c(FALSE))
+# 
+# for(i in 1:nrow(org_frame1006)) {
+#   org_frame1006$AND[i] <- org_list1006[[i]]$AND
+#   org_frame1006$totCon[i] <- org_list1006[[i]]$totCon
+#   org_frame1006$OR[i] <- org_list1006[[i]]$OR
+#   org_frame1006$orCon[i] <- org_list1006[[i]]$orCon
+#   org_frame1006$avgOC[i] <- org_list1006[[i]]$avgOC
+#   org_frame1006$passed[i] <- org_list1006[[i]]$passed
+# }
+# 
+# g20 <- ggplot(org_frame1006, aes(avgOC)) + geom_histogram(binwidth = 1)
+# 
+# plot(g20)
+#  
+# g21 <- ggplot(org_frame1006, aes(avgOC)) + geom_histogram(binwidth = 1) + coord_cartesian(xlim=c(0,15), ylim=c(0, 2000)) + labs(title = "zoomed in")
+# 
+# plot(g21)
+# 
+# g22 <- ggplot(org_frame1006, aes(OR)) + geom_histogram(binwidth = 1)
+# 
+# plot(g22)
+# 
+# #for scoring concepts per OR statement in a MH (0 to 2):
+# #if: average number of concepts per OR statement = 0 -> score of 0
+# #else if: average number of concepts per OR statement > 0 && < upper hinge -> score of 1
+# #else if: average number of concepts per OR statement >= upper hinge of data -> score of 2
+# 
+# 
+# avg_oc_score <- data.frame("avgOCScore" = c(1:nrow(org_frame1006)))
+# 
+# org_frame1007 <- cbind(org_frame1006, avg_oc_score)
+# 
+# for(i in 1:nrow(org_frame1007)) {
+#   if(org_frame1007$avgOC[i] == 0) {
+#     org_frame1007$avgOCScore[i] <- 0
+#   }
+#   else if(org_frame1007$avgOC[i] < fivenum(org_frame1007$avgOC)[4]) {
+#     org_frame1007$avgOCScore[i] <- 1
+#   }
+#   else if(org_frame1007$avgOC[i] >= fivenum(org_frame1007$avgOC)[4]) {
+#     org_frame1007$avgOCScore[i] <- 2
+#   }
+# }
+# 
+# g23 <- ggplot(org_frame1007, aes(avgOCScore)) + geom_histogram(binwidth = 1)
+# 
+# plot(g23)
+# 
+# 
+# #OR presence for MH: if there are concepts in OR clauses in a MH, score is 1 + ((# of OR clauses) / (max number of OR clauses))
+# 
+# mh_or_score <- data.frame("ORScore" = c(1:nrow(org_frame1007)))
+# 
+# org_frame1007 <- cbind(org_frame1007, mh_or_score)
+# 
+# for(i in 1:nrow(org_frame1007)) {
+#   if(org_frame1007$OR[i] == 0) {
+#     org_frame1007$ORScore[i] <- 0
+#   }
+#   else if(org_frame1007$OR[i] == 1) {
+#     org_frame1007$ORScore[i] <- 1
+#   }
+#   else {
+#     org_frame1007$ORScore[i] <- 1.0 + as.double(as.double(as.double(org_frame1007$OR[i])) / as.double(as.double(fivenum(org_frame1007$OR)[5])))
+#   }
+# }
+# 
+# g24 <- ggplot(org_frame1007, aes(ORScore)) + geom_histogram(binwidth = 1)
+# 
+# plot(g24)
+# 
+# #AND Presence for MH: If there are also concepts in an AND clause, that aren't in an OR clause, in a Must Have, add 1
+# 
+# mh_and_score <- data.frame("ANDScore" = c(1:nrow(org_frame1007)))
+# 
+# org_frame1007 <- cbind(org_frame1007, mh_and_score)
+# 
+# for(i in 1:nrow(org_frame1007)) {
+#   if(org_frame1007$totCon[i] > org_frame1007$orCon[i] 
+#      & org_frame1007$orCon[i] > 0) {
+#     org_frame1007$ANDScore[i] <- 1
+#   }
+#   else {
+#     org_frame1007$ANDScore[i] <- 0
+#   }
+# }
+# 
+# g25 <- ggplot(org_frame1007, aes(ANDScore)) + geom_histogram(binwidth = 1)
+# 
+# plot(g25)
+# 
+# #
+# ###cannot have ------------------------------------------
+# #
+# 
+# org_list1008 <- list()
+# 
+# for(i in 1:length(med_org_met)) {
+#   org_list1008[[i]] <- med_org_met[[i]][[4]]
+# }
+# 
+# org_frame1008 <- data.frame("OR" = c(1:length(org_list1008)), "totCon" = c(1:length(org_list1008)),"AND" = c(1:length(org_list1008)), "andCon" = c(1:length(org_list1008)), "avgAC" = c(1:length(org_list1008)), "passed" = c(FALSE))
+# 
+# for(i in 1:nrow(org_frame1008)) {
+#   org_frame1008$OR[i] <- org_list1008[[i]]$OR
+#   org_frame1008$totCon[i] <- org_list1008[[i]]$totCon
+#   org_frame1008$AND[i] <- org_list1008[[i]]$AND
+#   org_frame1008$andCon[i] <- org_list1008[[i]]$andCon
+#   org_frame1008$avgAC[i] <- org_list1008[[i]]$avgAC
+#   org_frame1008$passed[i] <- org_list1008[[i]]$passed
+# }
+# 
+# g26 <- ggplot(org_frame1008, aes(avgAC)) + geom_histogram(binwidth = 1)
+# 
+# plot(g26)
+#  
+# g27 <- ggplot(org_frame1008, aes(avgAC)) + geom_histogram(binwidth = 1) + coord_cartesian(xlim=c(0,15), ylim=c(0, 2000)) + labs(title = "zoomed in")
+# 
+# plot(g27)
+# 
+# g28 <- ggplot(org_frame1008, aes(OR)) + geom_histogram(binwidth = 1)
+# 
+# plot(g28)
+# 
+# #cannot have presence:
+# #if there is a cannot have clause: score of 1
+# 
+# 
+# ch_presence <- data.frame("Presence" = c(1:nrow(org_frame1008)))
+# 
+# org_frame1009 <- cbind(org_frame1008, ch_presence)
+# 
+# for(i in 1:nrow(org_frame1009)) {
+#   if(org_frame1009$totCon[i] > 0) {
+#     org_frame1009$Presence[i] <- 1
+#   }
+#   else {
+#     org_frame1009$Presence[i] <- 0
+#   }
+# }
+# 
+# g29 <- ggplot(org_frame1009, aes(Presence)) + geom_histogram()
+# 
+# plot(g29)
+# 
+# org_frame1010 <- subset(org_frame1008, totCon > 0)
+# 
+# g30 <- ggplot(org_frame1010, aes(totCon)) + geom_histogram()
+# 
+# plot(g30)
+# 
+# #for concepts in CH:
+# #if there is no CH: score of 0, duh
+# #else if the # of concepts is less than the median of those with a CH, score of 1
+# #else, score of 1 + (# of concepts)/(max # of concepts)
+# 
+# ch_totCon <- data.frame("totConScore" = c(1:nrow(org_frame1009)))
+# 
+# org_frame1009 <- cbind(org_frame1009, ch_totCon)
+# 
+# for(i in 1:nrow(org_frame1009)) {
+#   if(org_frame1009$totCon[i] == 0) {
+#     org_frame1009$totConScore[i] <- 0
+#   }
+#   else if(org_frame1009$totCon[i] < fivenum(subset(org_frame1009, totCon > 0)$totCon)[3]) {
+#     org_frame1009$totConScore[i] <- 1
+#   }
+#   else {
+#     org_frame1009$totConScore[i] <- 1.0 + as.double(as.double(as.double(org_frame1009$totCon[i])) / as.double(as.double(fivenum(org_frame1009$totCon)[5])))
+#   }
+# }
+# 
+# g31 <- ggplot(org_frame1009, aes(totConScore)) + geom_bar()
+# 
+# plot(g31)
+# 
+# g32 <- g31 + coord_cartesian(xlim=c(1,2), ylim=c(0, 650)) + labs(title = "zoomed in")
+# 
+# plot(g32)
+
+
+# org_list1008 <- list()
+# 
+# for(i in 1:length(med_org_met)) {
+#   org_list1008[[i]] <- med_org_met[[i]][[4]]
+# }
+# 
+# org_frame1008 <- data.frame("OR" = c(1:length(org_list1008)), "orCon" = c(1:length(org_list1008)), "avgOC" = c(1:length(org_list1008)), "passed" = c(FALSE))
+# 
+# for(i in 1:nrow(org_frame1008)) {
+#   org_frame1008$OR[i] <- org_list1008[[i]]$OR
+#   org_frame1008$orCon[i] <- org_list1008[[i]]$orCon
+#   org_frame1008$avgOC[i] <- org_list1008[[i]]$avgOC
+#   org_frame1008$passed[i] <- org_list1008[[i]]$passed
+# }
+# 
+# g24 <- ggplot(org_frame1008, aes(avgOC)) + geom_histogram(binwidth = 1)
+# 
+# plot(g24)
+# 
+# g25 <- ggplot(org_frame1008, aes(avgOC)) + geom_histogram(binwidth = 1) + coord_cartesian(xlim=c(0,15), ylim=c(0, 800)) + labs(title = "zoomed in")
+# 
+# plot(g25)
+# 
+org_list1001 <- list()
+
+for(i in 1:length(med_org_met)) {
+  org_list1001[[i]] <- med_org_met[[i]][[2]]
+}
+
+org_frame1001 <- data.frame("mustHave" = c(FALSE), "cannotHave" = c(FALSE), "indEvents" = c(1:length(org_list1001)), "dependentEvents" = c(1:length(org_list1001)))
+
+for(i in 1:nrow(org_frame1001)) {
+  org_frame1001$mustHave[i] <- org_list1001[[i]]$mustHave
+  org_frame1001$cannotHave[i] <- org_list1001[[i]]$cannotHave
+  org_frame1001$indEvents[i] <- org_list1001[[i]]$indEvents
+  org_frame1001$dependentEvents[i] <- org_list1001[[i]]$dependentEvents
+}
+
+
+#g26 <- ggplot(org_frame1001, aes(indEvents)) + geom_histogram(binwidth = 1)
+#
+#plot(g26)
+# 
+# g27 <- ggplot(org_frame1001, aes(dependentEvents)) + geom_histogram(binwidth = 1)
+# 
+# plot(g27)
+
+org_list1002 <- list()
+
+for(i in 1:length(med_org_met)) {
+  org_list1002[[i]] <- med_org_met[[i]][[3]]
+}
+
+org_frame1002 <- data.frame("AND" = c(1:length(org_list1002)), "totCon" = c(1:length(org_list1002)),"OR" = c(1:length(org_list1002)), "orCon" = c(1:length(org_list1002)), "avgOC" = c(1:length(org_list1002)), "passed" = c(FALSE))
+
+for(i in 1:nrow(org_frame1002)) {
+  org_frame1002$AND[i] <- org_list1002[[i]]$AND
+  org_frame1002$totCon[i] <- org_list1002[[i]]$totCon
+  org_frame1002$OR[i] <- org_list1002[[i]]$OR
+  org_frame1002$orCon[i] <- org_list1002[[i]]$orCon
+  org_frame1002$avgOC[i] <- org_list1002[[i]]$avgOC
+  org_frame1002$passed[i] <- org_list1002[[i]]$passed
+}
+
+# g28 <- ggplot(org_frame1002, aes(avgOC)) + geom_histogram(binwidth = 1)
+# 
+# plot(g28)
+
+
+org_list1003 <- list()
+
+for(i in 1:length(med_org_met)) {
+  org_list1003[[i]] <- med_org_met[[i]][[4]]
+}
+
+org_frame1003 <- data.frame("OR" = c(1:length(org_list1003)), "totCon" = c(1:length(org_list1003)),"AND" = c(1:length(org_list1003)), "andCon" = c(1:length(org_list1003)), "avgAC" = c(1:length(org_list1003)), "passed" = c(FALSE))
+
+for(i in 1:nrow(org_frame1003)) {
+  org_frame1003$OR[i] <- org_list1003[[i]]$OR
+  org_frame1003$totCon[i] <- org_list1003[[i]]$totCon
+  org_frame1003$AND[i] <- org_list1003[[i]]$AND
+  org_frame1003$andCon[i] <- org_list1003[[i]]$andCon
+  org_frame1003$avgAC[i] <- org_list1003[[i]]$avgAC
+  org_frame1003$passed[i] <- org_list1003[[i]]$passed
+}
+
+# g29 <- ggplot(org_frame1003, aes(avgAC)) + geom_histogram(binwidth = 1)
+# 
+# plot(g29)
+
+org_list1004 <- list()
+
+for(i in 1:length(med_org_met)) {
+  org_list1004[[i]] <- med_org_met[[i]][[5]]
+}
+
+global_met_sum <- 0
+
+for(i in 1:length(org_list1004)) {
+  global_met_sum <- global_met_sum + nrow(org_list1004[[i]])
+}
+
+org_frame1004 <- data.frame("conName" = c(""), "conCat" = c(""),"numCon" = c(1:global_met_sum), "queryNum" = c(1:global_met_sum))
+
+i <- 1
+for(j in 1:length(org_list1004)) {
+  for(k in 1:nrow(org_list1004[[j]])) {
+    org_frame1004$conName[i] <- org_list1004[[j]]$conName[k]
+    org_frame1004$conCat[i] <- org_list1004[[j]]$conCat[k]
+    org_frame1004$numCon[i] <- org_list1004[[j]]$numCon[k]
+    org_frame1004$queryNum[i] <- org_list1004[[j]]$queryNum[k]
+    i <- i + 1
+  }
+}
+
+org_list1005 <- list()
+
+for(i in 1:length(med_org_met)) {
+  org_list1005[[i]] <- med_org_met[[i]][[6]]
+}
+
+qual_met_sum <- 0
+
+for(i in 1:length(org_list1005)) {
+  qual_met_sum <- qual_met_sum + nrow(org_list1005[[i]])
+}
+
+org_frame1005 <- data.frame("qualCon" = c(""), "qualCat" = c(""),"numQual" = c(1:qual_met_sum), "queryNum" = c(1:qual_met_sum))
+
+i <- 1
+for(j in 1:length(org_list1005)) {
+  for(k in 1:nrow(org_list1005[[j]])) {
+    org_frame1005$qualCon[i] <- org_list1005[[j]]$qualCon[k]
+    org_frame1005$qualCat[i] <- org_list1005[[j]]$qualCat[k]
+    org_frame1005$numQual[i] <- org_list1005[[j]]$numQual[k]
+    org_frame1005$queryNum[i] <- org_list1005[[j]]$queryNum[k]
+    i <- i + 1
+  }
+}
+
+#
+#Diversity of concepts
+#
+
+org_frame_catScore <- org_frame1004
+
+con_cat_score <- data.frame("catScore" = c(1:nrow(org_frame_catScore)))
+
+org_frame_catScore <- cbind(org_frame_catScore, con_cat_score)
+
+org_frame_catScore$catScore[1:nrow(org_frame_catScore)] <- 0
+
+
+# addSmallLegend <- function(myPlot, textSize = 10, spaceLegend = 0.8) {
+#     myPlot +
+#         theme(legend.title = element_text(size = textSize),
+#               legend.text  = element_text(size = textSize),
+#               legend.key.size = unit(spaceLegend, "lines"))
+# }
+
+org_frame_catScore2 <- unique(select(org_frame_catScore, conCat, queryNum))
+
+
+
+#category diversity scoring: 1 point for every category, unless that category is none, which just means no category
+
+con_cat_score <- data.frame("catScore" = c(1:nrow(org_frame_catScore2)))
+
+org_frame_catScore2 <- cbind(org_frame_catScore2, con_cat_score)
+
+org_frame_catScore2$catScore[1:nrow(org_frame_catScore2)] <- 0
+
+for(i in 1:nrow(org_frame_catScore2)) {
+  if(org_frame_catScore2$conCat[i] == "None") {
+    org_frame_catScore2$catScore[i] <- 0
+  }
+  else {
+    org_frame_catScore2$catScore[i] <- nrow(subset(org_frame_catScore2, queryNum == org_frame_catScore2$queryNum[i]))
+  }
+}
+
+g30 <- ggplot(org_frame_catScore2, aes(x = queryNum, y = 1, fill = conCat)) + geom_bar(stat = "identity")# + coord_cartesian(xlim = c(0, 30), ylim = c(0,50))
+
+plot(g30)
+
+g31 <- ggplot(org_frame_catScore2, aes(catScore)) + geom_histogram(binwidth = 1)# + coord_cartesian(xlim = c(0, 30), ylim = c(0,50))
+
+plot(g31)
+
+
+g32 <- ggplot(org_frame_catScore, aes(x = queryNum, y = numCon, fill = conCat)) + geom_bar(stat = "identity") + 
+
+plot(g32)
+
+g33 <- ggplot(org_frame_catScore[121:132,], aes(numCon,x = queryNum, fill = conCat)) + geom_histogram(binwidth = 1)
+
+plot(g33)
+
+con_score <- data.frame("conScore" = c(1:nrow(org_frame_catScore)))
+
+org_frame_catScore <- cbind(org_frame_catScore, con_score)
+
+org_frame_catScore$conScore[1:nrow(org_frame_catScore)] <- 0
+
+#conScore: 10 * number of concepts in query / the number of concepts in the query with the greatest number of concepts
+
+j <- 1
+for(i in 1:nrow(org_frame_catScore)) {
+  if(j != org_frame_catScore$queryNum[i]) {
+    j <- j + 1
+  }
+  org_frame_catScore$conScore[i] <- as.double(as.double(sum(subset(org_frame_catScore, queryNum == j)$numCon)) / 577.0)
+}
+
+
+for(i in 1:nrow(org_frame_catScore)) {
+  org_frame_catScore$conScore[i] <- 10 * org_frame_catScore$conScore[i]
+}
+
+org_frame_catScore3 <- unique(org_frame_catScore[4:6])
+
+g34 <- ggplot(org_frame_catScore3, aes(conScore)) + geom_histogram(binwidth = 0.01) + scale_x_log10()
+
+
+plot(g34)
+
+
+#
+#qualifier presence
+#
+
+org_frame_qualScore <- org_frame1005
+
+totQual <- ("totQual" = c(1:nrow(org_frame_qualScore)))
+
+org_frame_qualScore <- cbind(org_frame_qualScore, totQual)
+
+org_frame_qualScore$totQual <- 0
+
+j <- 1
+for(i in 1:nrow(org_frame_qualScore)) {
+  if (j != org_frame_qualScore$queryNum[i]) {
+    j <- j + 1
+  }
+  org_frame_qualScore$totQual[i] <- sum(subset(org_frame_qualScore, queryNum == j)$numQual)
+}
+
+org_frame_qualScore2 <- unique(org_frame_qualScore[3:5])
+
+qualScore <- ("qualScore" = c(1:nrow(org_frame_qualScore2)))
+
+org_frame_qualScore2 <- cbind(org_frame_qualScore2, qualScore)
+
+org_frame_qualScore2$qualScore <- 0
+
+#qualScore: if a query has 0 qualifiers, score of 0; 1 qualifier, score of 1; more than one qualifier, score of 2
+
+for(i in 1:nrow(org_frame_qualScore2)) {
+  if(org_frame_qualScore2$totQual[i] == 0) {
+    org_frame_qualScore2$qualScore[i] <- 0
+  }
+  else if(org_frame_qualScore2$totQual[i] < 2) {
+    org_frame_qualScore2$qualScore[i] <- 1
+  }
+  else if(org_frame_qualScore2$totQual[i] >= 2) {
+    org_frame_qualScore2$qualScore[i] <- 2
+  }
+}
+
+g35 <- ggplot(org_frame_qualScore2, aes(x = reorder(queryNum, -totQual), y = totQual)) + geom_bar(stat = "identity")
+
+plot(g35)
+
+g36 <- ggplot(org_frame_qualScore2, aes(qualScore)) + geom_histogram(binwidth = 1)
+
+plot(g36)
+
+
+
+#
+#must have scoring
+#
+
+g37 <- ggplot(org_frame1002, aes(x = avgOC, y = totCon)) + geom_point()
+
+plot(g37)
+
+
+g38 <- ggplot(org_frame1002, aes(x = avgOC, y = OR)) + geom_point()
+
+plot(g38)
+
+
+#avgOC for MH scoring:
+#for any query doesn't have a MH, score of 0
+#for any query that has an MH:
+#if total number of concepts in that must have is greater than 0, but less than or equal to the median of the dataset, score of 1
+#if total number of concepts is greater than median of the dataset, score of 2
+#ADD +++++
+#if avgOC is greater than 0, but less than or equal to the median of the dataset of all the queries with concepts with an or clause, score of 1
+#if greater than median, score of 2
+
+
+orScore <- data.frame("orScore" = c(1:nrow(org_frame1002)))
+
+org_frame1002 <- cbind(org_frame1002, orScore)
+
+org_frame1002$orScore <- 0
+
+for(i in 86457:nrow(org_frame1002)) {
+  if (org_frame1002$totCon[i] == 0
+      & org_frame1002$orCon[i] == 0) {
+    org_frame1002$orScore[i] <- 0
+  }
+  else {
+    if (org_frame1002$totCon[i] > 0
+        &
+        org_frame1002$totCon[i] <= fivenum(org_frame1002$totCon)[3]) {
+      org_frame1002$orScore[i] <- org_frame1002$orScore[i] + 1
+    }
+    else if (org_frame1002$totCon[i] > fivenum(org_frame1002$totCon)[3]) {
+      org_frame1002$orScore[i] <- org_frame1002$orScore[i] + 2
+    }
+    if (org_frame1002$avgOC[i] > 0
+        &
+        org_frame1002$avgOC[i] <= fivenum(subset(org_frame1002, avgOC != 0)$avgOC)[3]) {
+      org_frame1002$orScore[i] <- org_frame1002$orScore[i] + 1
+    }
+    else if (org_frame1002$avgOC[i] > fivenum(subset(org_frame1002, avgOC != 0)$avgOC)[3]) {
+      org_frame1002$orScore[i] <- org_frame1002$orScore[i] + 2
+    }
+  }
+}
+
+g39 <- ggplot(org_frame1002, aes(orScore)) + geom_histogram(binwidth = 1)
+
+plot(g39)
+
+
+
+#
+#cannot have scoring
+#
+
+
+g40 <- ggplot(org_frame1003, aes(x = avgAC, y = totCon)) + geom_point()
+
+plot(g40)
+
+
+g41 <- ggplot(org_frame1003, aes(x = avgAC, y = AND)) + geom_point()
+
+plot(g41)
+
+#avgAC for CH scoring:
+#for a query without a CH, score of 0
+#for query with a CH, + 1 if the total number of concepts is <= the median dataset of all queries with a CH
+#+ 2 for > median dataset
+# + 1 if there is a concept within an AND clause
+
+andScore <- data.frame("andScore" = c(1:nrow(org_frame1003)))
+
+org_frame1003 <- cbind(org_frame1003, andScore)
+
+org_frame1003$andScore <- 0
+
+for(i in 1:nrow(org_frame1003)) {
+  if(org_frame1003$totCon[i] == 0
+     & org_frame1003$andCon[i] == 0) {
+    org_frame1003$andScore[i] <- 0
+  }
+  else {
+    if(org_frame1003$totCon[i] <= fivenum(subset(org_frame1003, totCon > 0)$totCon)[3]) {
+      org_frame1003$andScore[i] <- 1
+    }
+    else if(org_frame1003$totCon[i] > fivenum(subset(org_frame1003, totCon > 0)$totCon)[3]) {
+      org_frame1003$andScore[i] <- 2
+    }
+    if(org_frame1003$avgAC[i] > 0) {
+      org_frame1003$andScore[i] <- org_frame1003$andScore[i] + 1
+    }
+  }
+}
+
+g42 <- ggplot(org_frame1003, aes(andScore)) + geom_histogram(binwidth = 1)
+
+plot(g42)
+
+#
+#event presence
+#
+
+g43 <- ggplot(org_frame1001, aes(indEvents)) + geom_histogram(binwidth = 1)
+
+plot(g43)
+
+#independent event presence score: 
+#0 independent events: score of 0
+#1 independent event: score of 1
+#anything more, and its 1 + number of indEvent/max number of indEvent
+
+indScore <- data.frame("indScore" = c(1:nrow(org_frame1001)))
+
+org_frame1001 <- cbind(org_frame1001, indScore)
+
+org_frame1001$indScore <- 0
+
+for(i in 1:nrow(org_frame1001)) {
+  if(org_frame1001$indEvents[i] == 0) {
+    org_frame1001$indScore[i] <- 0.0
+  }
+  else if(org_frame1001$indEvents[i] == 1) {
+    org_frame1001$indScore[i] <- 1.0
+  }
+  else {
+    org_frame1001$indScore[i] <- 1.0 + as.double(as.double(as.double(org_frame1001$indEvents[i]) - 1.0) / as.double(as.double(fivenum(org_frame1001$indEvents)[5]) - 1.0))
+  }
+}
+
+g44 <- ggplot(org_frame1001, aes(indScore)) + geom_histogram(binwidth = 0.1)
+
+plot(g44)
+
+
+g45 <- ggplot(org_frame1001, aes(dependentEvents)) + geom_histogram(binwidth = 1)
+
+plot(g45)
+
+#dependent event presence score: 
+#0 dependent events: score of 0
+#1 dependent event: score of 1
+#anything more, and its 1 + number of dependentEvents/max number of dependentEvents
+
+depScore <- data.frame("depScore" = c(1:nrow(org_frame1001)))
+
+org_frame1001 <- cbind(org_frame1001, depScore)
+
+org_frame1001$depScore <- 0
+
+for(i in 1:nrow(org_frame1001)) {
+  if(org_frame1001$dependentEvents[i] == 0) {
+    org_frame1001$depScore[i] <- 0.0
+  }
+  else if(org_frame1001$dependentEvents[i] == 1) {
+    org_frame1001$depScore[i] <- 1.0
+  }
+  else {
+    org_frame1001$depScore[i] <- 1.0 + as.double(as.double(as.double(org_frame1001$dependentEvents[i]) - 1.0) / as.double(as.double(fivenum(org_frame1001$dependentEvents)[5]) - 1.0))
+  }
+}
+
+g46 <- ggplot(org_frame1001, aes(depScore)) + geom_histogram(binwidth = 0.1)
+
+plot(g46)
+```
+
+```{r}
+#########################Combining Metrics#############################
+
+org_frame_catScore4 <- org_frame_catScore2
+
+org_frame_catScore4 <- unique(org_frame_catScore4[2:3])
+
+org_frame_catScore4 <- cbind(org_frame_catScore4, org_frame_catScore3$conScore)
+
+names(org_frame_catScore4)[3] <- "conScore"
+
+org_frame_allScore <- cbind(org_frame_catScore4, org_frame_qualScore2$qualScore, org_frame1001$indScore, org_frame1001$depScore, org_frame1002$orScore, org_frame1003$andScore)
+
+names(org_frame_allScore) <- c("queryNum", "catScore", "conScore", "qualScore", "indScore", "depScore", "orScore", "andScore")
+
+ggparcoord(org_frame_allScore, columns = 2:8, scale = "uniminmax")
+
+library(MASS)
+
+parcoord(org_frame_allScore[,c(2:8)])
+
+#989
+library(fmsb)
+
+maxmin <- data.frame("catScore" = c(9, 0), "conScore" = c(10, 0), "qualScore" = c(2, 0), "indScore" = c(2, 0), "depScore" = c(2, 0), "orScore" = c(4, 0), "andScore" = c(3, 0))
+
+org989 <- org_frame_allScore[2:8][989,]
+
+org989 <- rbind(maxmin, org989)
+
+radarchart(org989, maxmin = TRUE, title = "Query Number 989")
+
+
+#graphing unweighted complexity
+
+org_frame_allScore2 <- melt(org_frame_allScore, id = "queryNum")
+
+g47 <- ggplot(org_frame_allScore2, aes(x = queryNum, y = value, fill = variable)) + geom_bar(stat = "identity")
+
+plot(g47)
+
+g48 <- ggplot(org_frame_allScore2, aes(x = reorder(queryNum, -value), y = value, fill = variable)) + geom_bar(stat = "identity")
+
+plot(g48)
+
+#
+#weighing each metric:
+#weight 1 (overweighing):
+# - dependent score * 2.5
+# - independent score * 2
+# - orScore / andScore * 1.5
+# - category diversity score * 1.2
+# - qualifiers score * 1.1
+# - total concept score * 1
+#
+
+org_frame_over <- org_frame_allScore
+
+org_frame_over[2] <- org_frame_over[2] * 1.2
+
+org_frame_over[4] <- org_frame_over[4] * 1.1
+
+org_frame_over[5] <- org_frame_over[5] * 2.0
+
+org_frame_over[6] <- org_frame_over[6] * 2.5
+
+org_frame_over[7] <- org_frame_over[7] * 1.5
+
+org_frame_over[8] <- org_frame_over[8] * 1.5
+
+org_frame_over2 <- melt(org_frame_over, id = "queryNum")
+
+g49 <- ggplot(org_frame_over2, aes(x = reorder(queryNum, -value), y = value, fill = variable)) + geom_bar(stat = "identity")
+
+plot(g49)
+
+
+#
+#weight 2 (underweighing):
+# - dependent score * 1
+# - independent score * 0.9
+# - orScore / andScore * 0.7
+# - category diversity score * 0.6
+# - qualifiers score * 0.55
+# - total concept score * 0.45
+#
+
+org_frame_under <- org_frame_allScore
+
+org_frame_under[2] <- org_frame_under[2] * 0.6
+
+org_frame_under[3] <- org_frame_under[3] * 0.45
+
+org_frame_under[4] <- org_frame_under[4] * 0.55
+
+org_frame_under[5] <- org_frame_under[5] * 0.9
+
+org_frame_under[7] <- org_frame_under[7] * 0.7
+
+org_frame_under[8] <- org_frame_under[8] * 0.7
+
+org_frame_under2 <- melt(org_frame_under, id = "queryNum")
+
+g50 <- ggplot(org_frame_under2, aes(x = reorder(queryNum, -value), y = value, fill = variable)) + geom_bar(stat = "identity")
+
+plot(g49)
+plot(g50)
+
+
+g51 <- ggplot(subset(org_frame_allScore2, variable == "catScore"), aes(x = reorder(queryNum, -value), y = value)) + geom_bar(stat = "identity")
+
+g52 <- ggplot(subset(org_frame_allScore2, variable == "conScore"), aes(x = reorder(queryNum, -value), y = value)) + geom_bar(stat = "identity")
+
+g53 <- ggplot(subset(org_frame_allScore2, variable == "qualScore"), aes(x = reorder(queryNum, -value), y = value)) + geom_bar(stat = "identity")
+
+g54 <- ggplot(subset(org_frame_allScore2, variable == "indScore"), aes(x = reorder(queryNum, -value), y = value)) + geom_bar(stat = "identity")
+
+g55 <- ggplot(subset(org_frame_allScore2, variable == "depScore"), aes(x = reorder(queryNum, -value), y = value)) + geom_bar(stat = "identity")
+
+g56 <- ggplot(subset(org_frame_allScore2, variable == "orScore"), aes(x = reorder(queryNum, -value), y = value)) + geom_bar(stat = "identity")
+
+g57 <- ggplot(subset(org_frame_allScore2, variable == "andScore"), aes(x = reorder(queryNum, -value), y = value)) + geom_bar(stat = "identity")
+
+plot(g51)
+plot(g52)
+plot(g53)
+plot(g54)
+plot(g55)
+plot(g56)
+plot(g57)
+
+
+#
+#new weighing/scoring system
+#
+
+org_frame_allScore3 <- dplyr::select(org_frame_allScore, -conScore)
+
+
+#min = 0; max = 9 (there are 9 possible categories, so this works nicely)
+
+org_frame_allScore3[3] <- org_frame_allScore3[3] * 4.5
+org_frame_allScore3[4] <- org_frame_allScore3[4] * 4.5
+org_frame_allScore3[5] <- org_frame_allScore3[5] * 4.5
+org_frame_allScore3[6] <- org_frame_allScore3[6] * 2.25
+org_frame_allScore3[7] <- org_frame_allScore3[7] * 3
+
+
+#weighing system:
+#depScore stays the same
+#indScore * 0.85
+#orScore/andScore * 0.5
+#catScore * 0.3
+#qualScore * 0.2
+
+org_frame_weighted <- org_frame_allScore3
+
+org_frame_weighted[2] <- org_frame_weighted[2] * 0.3
+org_frame_weighted[3] <- org_frame_weighted[3] * 0.2
+org_frame_weighted[4] <- org_frame_weighted[4] * 0.85
+org_frame_weighted[6] <- org_frame_weighted[6] * 0.5
+org_frame_weighted[7] <- org_frame_weighted[7] * 0.5
+
+org_frame_weighted2 <- melt(org_frame_weighted, id = "queryNum")
+
+g58 <- ggplot(org_frame_weighted2, aes(x = reorder(queryNum, value), y = value, fill = variable)) + geom_bar(stat = "identity") + theme(axis.text.x = element_blank())
+
+plot(g58)
+
+
+org_frame_allScore5 <- org_frame_allScore
+
+org_frame_allScore5[3] <- org_frame_allScore5[3] * 0.9
+org_frame_allScore5[4] <- org_frame_allScore5[4] * 4.5
+org_frame_allScore5[5] <- org_frame_allScore5[5] * 4.5
+org_frame_allScore5[6] <- org_frame_allScore5[6] * 4.5
+org_frame_allScore5[7] <- org_frame_allScore5[7] * 2.25
+org_frame_allScore5[8] <- org_frame_allScore5[8] * 3
+
+#weighing system take 2:
+#depScore stays the same
+#indScore * 0.9
+#orScore/andScore * 0.65
+#qualScore * 0.45
+#catScore * 0.35
+#conScore * 0.25
+
+org_frame_weighted3 <- org_frame_allScore5
+
+org_frame_weighted3[2] <- org_frame_weighted3[2] * 0.35
+org_frame_weighted3[3] <- org_frame_weighted3[3] * 0.25
+org_frame_weighted3[4] <- org_frame_weighted3[4] * 0.45
+org_frame_weighted3[5] <- org_frame_weighted3[5] * 0.9
+org_frame_weighted3[7] <- org_frame_weighted3[7] * 0.65
+org_frame_weighted3[8] <- org_frame_weighted3[8] * 0.65
+
+org_frame_weighted4 <- melt(org_frame_weighted3, id = "queryNum")
+
+g59 <- ggplot(org_frame_weighted4, aes(x = reorder(queryNum, value), y = value, fill = variable)) + geom_bar(stat = "identity") + theme(axis.text.x = element_blank())
+
+plot(g59)
+
+#weighing system take 3
+#depScore stays the same
+#indScore * 0.9
+#orScore/andScore * 0.8
+#qualScore * 0.75
+#catScore * 0.6
+#conScore * 0.5
+
+org_frame_weighted5 <- org_frame_allScore5
+
+org_frame_weighted5[2] <- org_frame_weighted5[2] * 0.6
+org_frame_weighted5[3] <- org_frame_weighted5[3] * 0.5
+org_frame_weighted5[4] <- org_frame_weighted5[4] * 0.75
+org_frame_weighted5[5] <- org_frame_weighted5[5] * 0.9
+org_frame_weighted5[7] <- org_frame_weighted5[7] * 0.8
+org_frame_weighted5[8] <- org_frame_weighted5[8] * 0.8
+
+org_frame_weighted5 <- subset(org_frame_weighted5, conScore != 0)
+
+org_frame_weighted6 <- melt(org_frame_weighted5, id = "queryNum")
+
+g61 <- ggplot(org_frame_weighted6, aes(x = reorder(queryNum, value), y = value, fill = variable)) + geom_bar(stat = "identity") + theme(axis.text.x = element_blank()) + geom_hline(yintercept = 9.78)
+
+plot(g61)
+
+```

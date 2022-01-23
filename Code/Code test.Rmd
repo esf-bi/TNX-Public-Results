@@ -1,0 +1,174 @@
+---
+title: "Code test"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+
+code_level <- data.frame("codeLevel" = c(1:nrow(tnx_codes)))
+
+tnx_codes <- cbind(tnx_codes, code_level)
+
+tnx_codes$codeLevel <- 1
+
+for(i in 49237:nrow(tnx_codes)) {
+  tnx_codes$codeLevel[i] <- levelFun(tnx_codes$ordinal[i], 1)
+}
+#i == 49236
+
+levelFun <- function(code, level) {
+  if(nrow(subset(hierarchy, child_ordinal == code)) == 0) {
+    return(level)
+  }
+  else if(nrow(subset(hierarchy, child_ordinal == code)) > 1) {
+    sub_lev <- subset(hierarchy, child_ordinal == code)
+    big_lev <- list()
+    for(j in 1:nrow(sub_lev)) {
+      big_lev[length(big_lev) + 1] <- levelFun(sub_lev$ordinal[j], level + 1)
+    }
+    return(max(sapply(big_lev, max)))
+  }
+  else {
+    level <- level + 1
+    levelFun(subset(hierarchy, child_ordinal == code)$ordinal[1], level)
+  }
+}
+
+
+conCodes <- data.frame(lapply(conName, function(x) {
+  gsub("displayName", "", x)
+}))
+
+conCodes2 <- data.frame(lapply(conCodes, function(x) {
+  gsub(",$", "", x)
+}))
+
+tnx_codes_diag <- subset(tnx_codes, primary_category == "Diagnosis")
+
+tnx_codes_diag <- subset(tnx_codes_diag, system != "ICD9CM")
+
+chapter <- data.frame("code" = c(1:nrow(conCodes2)))
+
+conCodes2 <- cbind(conCodes2, chapter)
+
+conCodes2$code <- 0
+
+# for(i in 1:nrow(conCodes2)) {
+#   if(nrow(subset(tnx_codes_diag, term == conCodes2$conName[i])) == 0) {
+#     conCodes2$code[i] <- "Not Diagnosis"
+#   }
+#   else {
+#     conCodes2$code[i] <- subset(tnx_codes_diag, term == conCodes2$conName[i])$code[1]
+#   }
+# }
+
+conCodes3 <- conCodes2
+
+conCodes3 <- subset(conCodes3, code != "Not Diagnosis")
+
+conCodes3 <- subset(conCodes3, code != "0")
+
+chapter <- data.frame("chapter" = c(1:nrow(conCodes3)))
+
+conCodes3 <- cbind(conCodes3, chapter)
+
+conCodes3$chapter <- 0
+
+whatChapter <- function(code) {
+  if((!is.na(str_locate(code, "A")[1] == 1) & str_locate(code, "A")[1] == 1) | (!is.na(str_locate(code, "B")[1] == 1) & str_locate(code, "B")[1] == 1)) {
+    return("Certain infectious and parasitic diseases")
+  }
+  else if((!is.na(str_locate(code, "C")[1] == 1) & str_locate(code, "C")[1] == 1) | (!is.na(str_locate(code, "D0")[1] == 1) & str_locate(code, "D0")[1] == 1)
+          | (!is.na(str_locate(code, "D1")[1] == 1) & str_locate(code, "D1")[1] == 1)
+          | (!is.na(str_locate(code, "D2")[1] == 1) & str_locate(code, "D2")[1] == 1)
+          | (!is.na(str_locate(code, "D3")[1] == 1) & str_locate(code, "D3")[1] == 1)
+          | (!is.na(str_locate(code, "D4")[1] == 1) & str_locate(code, "D4")[1] == 1)) {
+    return("Neoplasms")
+  }
+  else if((!is.na(str_locate(code, "D5")[1] == 1) & str_locate(code, "D5")[1] == 1)
+          | (!is.na(str_locate(code, "D6")[1] == 1) & str_locate(code, "D6")[1] == 1)
+          | (!is.na(str_locate(code, "D7")[1] == 1) & str_locate(code, "D7")[1] == 1)
+          | (!is.na(str_locate(code, "D8")[1] == 1) & str_locate(code, "D8")[1] == 1)) {
+    return("Diseases of the blood and blood-forming organs and certain disorders involving the immune mechanism")
+  }
+  else if((!is.na(str_locate(code, "E")[1] == 1) & str_locate(code, "E")[1] == 1)) {
+    return("Endocrine, nutritional and metabolic diseases")
+  }
+  else if((!is.na(str_locate(code, "F")[1] == 1) & str_locate(code, "F")[1] == 1)) {
+    return("Mental, Behavioral and Neurodevelopmental disorders")
+  }
+  else if((!is.na(str_locate(code, "G")[1] == 1) & str_locate(code, "G")[1] == 1)) {
+    return("Diseases of the nervous system")
+  }
+  else if((!is.na(str_locate(code, "H0")[1] == 1) & str_locate(code, "H0")[1] == 1)
+          | (!is.na(str_locate(code, "H1")[1] == 1) & str_locate(code, "H1")[1] == 1)
+          | (!is.na(str_locate(code, "H2")[1] == 1) & str_locate(code, "H2")[1] == 1)
+          | (!is.na(str_locate(code, "H3")[1] == 1) & str_locate(code, "H3")[1] == 1)
+          | (!is.na(str_locate(code, "H4")[1] == 1) & str_locate(code, "H4")[1] == 1)
+          | (!is.na(str_locate(code, "H5")[1] == 1) & str_locate(code, "H5")[1] == 1)) {
+    return("Diseases of the eye and adnexa")
+  }
+  else if((!is.na(str_locate(code, "H6")[1] == 1) & str_locate(code, "H6")[1] == 1)
+          | (!is.na(str_locate(code, "H7")[1] == 1) & str_locate(code, "H7")[1] == 1)
+          | (!is.na(str_locate(code, "H8")[1] == 1) & str_locate(code, "H8")[1] == 1)
+          | (!is.na(str_locate(code, "H9")[1] == 1) & str_locate(code, "H9")[1] == 1)) {
+    return("Diseases of the ear and mastoid process")
+  }
+  else if((!is.na(str_locate(code, "I")[1] == 1) & str_locate(code, "I")[1] == 1)) {
+    return("Diseases of the circulatory system")
+  }
+  else if((!is.na(str_locate(code, "J")[1] == 1) & str_locate(code, "J")[1] == 1)) {
+    return("Diseases of the respiratory system")
+  }
+  else if((!is.na(str_locate(code, "K")[1] == 1) & str_locate(code, "K")[1] == 1)) {
+    return("Diseases of the digestive system")
+  }
+  else if((!is.na(str_locate(code, "L")[1] == 1) & str_locate(code, "L")[1] == 1)) {
+    return("Diseases of the skin and subcutaneous tissue")
+  }
+  else if((!is.na(str_locate(code, "M")[1] == 1) & str_locate(code, "M")[1] == 1)) {
+    return("Diseases of the musculoskeletal system and connective tissue")
+  }
+  else if((!is.na(str_locate(code, "N")[1] == 1) & str_locate(code, "N")[1] == 1)) {
+    return("Diseases of the genitourinary system")
+  }
+  else if((!is.na(str_locate(code, "O")[1] == 1) & str_locate(code, "O")[1] == 1)) {
+    return("Pregnancy, childbirth and the puerperium")
+  }
+  else if((!is.na(str_locate(code, "P")[1] == 1) & str_locate(code, "P")[1] == 1)) {
+    return("Certain conditions originating in the perinatal period")
+  }
+  else if((!is.na(str_locate(code, "Q")[1] == 1) & str_locate(code, "Q")[1] == 1)) {
+    return("Congenital malformations, deformations and chromosomal abnormalities")
+  }
+  else if((!is.na(str_locate(code, "R")[1] == 1) & str_locate(code, "R")[1] == 1)) {
+    return("Symptoms, signs and abnormal clinical and laboratory findings, not elsewhere classified")
+  }
+  else if((!is.na(str_locate(code, "S")[1] == 1) & str_locate(code, "S")[1] == 1) | (!is.na(str_locate(code, "T")[1] == 1) & str_locate(code, "T")[1] == 1)) {
+    return("Injury, poisoning and certain other consequences of external causes")
+  }
+  else if((!is.na(str_locate(code, "V")[1] == 1) & str_locate(code, "V")[1] == 1) | (!is.na(str_locate(code, "W")[1] == 1) & str_locate(code, "W")[1] == 1)
+          | (!is.na(str_locate(code, "X")[1] == 1) & str_locate(code, "X")[1] == 1) | (!is.na(str_locate(code, "Y")[1] == 1) & str_locate(code, "Y")[1] == 1)) {
+    return("External causes of morbidity")
+  }
+  else if((!is.na(str_locate(code, "Z")[1] == 1) & str_locate(code, "Z")[1] == 1)) {
+    return("Factors influencing health status and contact with health services")
+  }
+}
+
+for(i in 1:nrow(conCodes3)) {
+  conCodes3$chapter[i] <- whatChapter(conCodes3$code[i])
+}
+
+library(ggplot2)
+
+g67 <- ggplot(conCodes3, aes(chapter)) + geom_bar() + theme(axis.text.x = element_text(size = 4, angle = 90)) + stat_count(geom = "text", size = 2, aes(label = ..count..), position = position_stack(vjust = 0.5))
+
+plot(g67)
+```

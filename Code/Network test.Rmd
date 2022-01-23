@@ -1,0 +1,954 @@
+---
+title: "Network test"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+library(devtools)
+library(odbc)
+library(mongolite)
+library(elasticsearchr)
+library(elastic)
+library(ggplot2)
+library(stringr)
+library(DescTools)
+library(reshape2)
+library(GGally)
+library(MASS)
+
+
+med_org2 <-
+  data.frame("Type" = c(""),
+    "Org" = c(""),
+    "QStr" = c(""),
+    stringsAsFactors = FALSE
+  )
+
+for (i in 1:length(xyz[["hits"]][["hits"]])) {
+  med_org2 <-
+    rbind(med_org2, c(xyz[["hits"]][["hits"]][[i]][["_source"]][["orgType"]], xyz[["hits"]][["hits"]][[i]][["_source"]][["orgName"]], xyz[["hits"]][["hits"]][[i]][["_source"]][["queryStr"]]))
+}
+
+
+med_org2 <- subset(med_org2, Type != "")
+med_org2 <- subset(med_org2, Org != "")
+med_org2 <- subset(med_org2, QStr != "{}")
+
+med_org2 <-
+  data.frame(lapply(med_org2, function(x) {
+    gsub("\n", "", x)
+  }))
+
+med_org2 <-
+  data.frame(lapply(med_org2, function(x) {
+    gsub("\"", "", x)
+  }))
+
+med_org2 <-
+  data.frame(lapply(med_org2, function(x) {
+    gsub(" : ", "", x)
+  }))
+
+med_org2 <- data.frame(lapply(med_org2, function(x)
+{
+  gsub("AND : \\[ \\]|AND\\[ \\]", "", x)
+}))
+
+med_org2 <- data.frame(lapply(med_org2, function(x)
+{
+  gsub("OR : \\[ \\]|OR\\[ \\]", "", x)
+}))
+
+med_org2 <- data.frame(lapply(med_org2, function(x)
+{
+  gsub("mustHave : \\{      \\}|mustHave\\{      \\}", "", x)
+}))
+
+med_org2 <- data.frame(lapply(med_org2, function(x)
+{
+  gsub("cannotHave : \\{      \\}|cannotHave\\{      \\}", "", x)
+}))
+
+```
+
+```{r}
+med_org_c2 <- med_org2
+
+med_org_c2 <- data.frame(lapply(med_org_c2, function(x)
+{
+  gsub("mustHave", "mustHave\\*MH\\*", x)
+}))
+
+med_org_c2 <- data.frame(lapply(med_org_c2, function(x)
+{
+  gsub("cannotHave", "cannotHave\\*CH\\*", x)
+}))
+
+med_org_c2 <- data.frame(lapply(med_org_c2, function(x)
+{
+  gsub("event\\[", "event\\*EVE\\*EVE\\*\\[", x)
+}))
+
+med_org_c2 <- data.frame(lapply(med_org_c2, function(x)
+{
+  gsub("AND\\[", "AND\\*\\&\\*\\[", x)
+}))
+
+med_org_c2 <- data.frame(lapply(med_org_c2, function(x)
+{
+  gsub("OR\\[", "OR\\*\\|\\*\\[", x)
+}))
+
+med_org_c2 <- data.frame(lapply(med_org_c2, function(x)
+{
+  gsub("dates\\{", "dates\\*DAT\\*\\{", x)
+}))
+
+med_org_spl2 <- med_org_spl
+
+for (i in 1:length(med_org_spl2)) {
+  med_org_spl2[[i]][[1]] <- med_org_spl2[[i]]
+  med_org_spl2[[i]][[3]] <- NULL
+  med_org_spl2[[i]][[2]] <- NULL
+  
+  med_org_spl2[[i]] <- as.list(med_org_spl2[[i]])
+}
+
+for(i in 1:length(med_org_spl2)) {
+  med_org_spl2[[i]][[1]] <- med_org_spl2[[i]]
+  
+  tempframe <- data.frame("Type" = c(med_org_c2$Type[i]), "Org" = c(med_org_c2$Org[i]))
+  
+  med_org_spl2[[i]][[2]] <- tempframe
+}
+
+
+med_org_met2 <- med_org_met
+
+for(i in 1:length(med_org_met2)) {
+    tempframe <- data.frame("Type" = c(med_org_c2$Type[i]), "Org" = c(med_org_c2$Org[i]))
+  
+  med_org_met2[[i]][[7]] <- tempframe
+}
+
+tempframe <- data.frame("Type" = c(1:nrow(med_org2)), "Org" = c(1:nrow(med_org2)))
+
+org_frame_allScore4 <- cbind(org_frame_allScore5, tempframe)
+
+for(i in 1:nrow(med_org2)) {
+  org_frame_allScore4$Type[i] <- med_org2$Type[i]
+  org_frame_allScore4$Org[i] <- med_org2$Org[i]
+}
+
+melt_allScore <- melt(org_frame_allScore4, id = c("queryNum", "Type"))
+
+melt_allScore <- subset(melt_allScore, variable != "Org")
+
+melt_allScore$value <- as.numeric(melt_allScore$value)
+
+g60 <- ggplot(melt_allScore, aes(x= reorder(queryNum, value), y= value, fill = variable)) + geom_bar(stat="identity") + facet_wrap(~Type, scales = "free") + theme(axis.text.x = element_blank())
+
+plot(g60)
+
+
+org_frame_weightAll <- org_frame_allScore4
+
+org_frame_weightAll[2] <- org_frame_weightAll[2] * 0.6
+org_frame_weightAll[3] <- org_frame_weightAll[3] * 0.5
+org_frame_weightAll[4] <- org_frame_weightAll[4] * 0.75
+org_frame_weightAll[5] <- org_frame_weightAll[5] * 0.9
+org_frame_weightAll[7] <- org_frame_weightAll[7] * 0.8
+org_frame_weightAll[8] <- org_frame_weightAll[8] * 0.8
+
+melt_allScore2 <- melt(org_frame_weightAll, id = c("queryNum", "Type"))
+
+melt_allScore2 <- subset(melt_allScore2, variable != "Org")
+
+melt_allScore2$value <- as.numeric(melt_allScore2$value)
+
+g62 <- ggplot(melt_allScore2, aes(x= reorder(queryNum, value), y= value, fill = variable)) + geom_bar(stat="identity") + facet_wrap(~Type, scales = "free") + theme(axis.text.x = element_blank())
+
+plot(g62)
+
+org_frame_weightAll2 <- org_frame_weightAll
+
+sumScore <- data.frame("sumScore" = c(1:nrow(org_frame_weightAll2)))
+
+org_frame_weightAll2 <- cbind(org_frame_weightAll2, sumScore)
+
+org_frame_weightAll2$sumScore <- 0
+
+for(i in 1:nrow(org_frame_weightAll2)) {
+  org_frame_weightAll2$sumScore[i] <- org_frame_weightAll2$catScore[i] + org_frame_weightAll2$conScore[i] + org_frame_weightAll2$qualScore[i] + org_frame_weightAll2$indScore[i] + org_frame_weightAll2$depScore[i] + org_frame_weightAll2$orScore[i] + org_frame_weightAll2$andScore[i]
+}
+
+#mean, std_dev, median, min, max
+
+mean(org_frame_weightAll2$sumScore)
+
+sd(org_frame_weightAll2$sumScore)
+
+fivenum(org_frame_weightAll2$sumScore)[3]
+
+fivenum(org_frame_weightAll2$sumScore)[1]
+
+fivenum(org_frame_weightAll2$sumScore)[5]
+
+#for pharma
+
+mean(subset(org_frame_weightAll2, Type == "Pharma")$sumScore)
+
+sd(subset(org_frame_weightAll2, Type == "Pharma")$sumScore)
+
+fivenum(subset(org_frame_weightAll2, Type == "Pharma")$sumScore)[3]
+
+fivenum(subset(org_frame_weightAll2, Type == "Pharma")$sumScore)[1]
+
+fivenum(subset(org_frame_weightAll2, Type == "Pharma")$sumScore)[5]
+
+#for provider
+
+mean(subset(org_frame_weightAll2, Type == "Provider")$sumScore)
+
+sd(subset(org_frame_weightAll2, Type == "Provider")$sumScore)
+
+fivenum(subset(org_frame_weightAll2, Type == "Provider")$sumScore)[3]
+
+fivenum(subset(org_frame_weightAll2, Type == "Provider")$sumScore)[1]
+
+fivenum(subset(org_frame_weightAll2, Type == "Provider")$sumScore)[5]
+
+g63 <- ggplot(org_frame_weightAll2, aes(sumScore)) + geom_histogram(binwidth = 1)
+
+plot(g63)
+
+org_frame_weightAll2 <- subset(org_frame_weightAll2, conScore != 0)
+
+melt_allScore3 <- melt(org_frame_weightAll2, id = c("queryNum", "Type"))
+
+melt_allScore3 <- subset(melt_allScore3, variable != "Org" & variable != "sumScore")
+
+melt_allScore3$value <- as.numeric(melt_allScore3$value)
+
+g64 <- ggplot(melt_allScore3, aes(x= reorder(queryNum, value), y= value, fill = variable)) + geom_bar(stat="identity") + facet_wrap(~Type, scales = "free") + theme(axis.text.x = element_blank()) + geom_hline(yintercept = 9.78)
+
+plot(g64)
+
+
+melt_allScore4 <- melt(org_frame_weightAll2, id = c("queryNum", "Org"))
+
+melt_allScore4 <- subset(melt_allScore4, variable != "Type" & variable != "sumScore")
+
+g65 <- ggplot(melt_allScore4, aes(x= reorder(queryNum, value), y= value, fill = variable)) + geom_bar(stat="identity") + facet_wrap(~Org, scales = "free", ncol = 3) + theme(axis.text.x = element_blank())
+
+plot(g65)
+
+iowa_org <- subset(org_frame_weightAll2, Org == "University of Iowa")
+
+parcoord(iowa_org[,c(2:8)])
+
+
+org_frame_amia <- org_frame_weightAll2
+
+names(org_frame_amia) <- c("queryNum", "category diversity", "concept total", "qualifier presence", "independent event presence", "dependent event presence", "OR Score", "AND Score", "Type", "Org", "sumScore")
+
+melt_amia <- melt(org_frame_amia, id = c("queryNum", "Type"))
+
+melt_amia <- subset(melt_amia, variable != "Org" & variable != "sumScore")
+
+melt_amia$value <- as.numeric(melt_amia$value)
+
+names(melt_amia) <- c("queryNum", "Type", "metric", "value")
+
+# melt_amia$Type <- data.frame(lapply(melt_amia$Type, function(x) {
+#   gsub("Provider", "Queries by Providers", x)
+# }))
+# 
+# melt_amia$Type <- data.frame(lapply(melt_amia$Type, function(x) {
+#   gsub("Pharma", "Queries by Pharma", x)
+# }))
+
+g66 <- ggplot(melt_amia, aes(x= reorder(queryNum, value), y= value, fill = metric)) + geom_bar(stat="identity") + facet_wrap(~Type, scales = "free", strip.position = "bottom") + theme(axis.text.x = element_blank()) + geom_hline(yintercept = 9.78) + labs(x = "", y = "complexity score")
+
+plot(g66)
+
+melt_pharma <- subset(melt_amia, Type == "Pharma")
+melt_prov <- subset(melt_amia, Type == "Provider")
+
+gPharma <- ggplot(melt_pharma, aes(x= reorder(queryNum, value), y= value, fill = metric)) + geom_bar(stat="identity") + theme(axis.text.x = element_blank()) + geom_hline(yintercept = 9.78) + labs(x = "Queries from Pharma", y = "complexity score") + geom_hline(yintercept = 11.27, color = "red")
+
+plot(gPharma)
+
+gProv <- ggplot(melt_prov, aes(x= reorder(queryNum, value), y= value, fill = metric)) + geom_bar(stat="identity") + theme(axis.text.x = element_blank()) + geom_hline(yintercept = 9.78) + labs(x = "Queries from Healthcare Provider", y = "complexity score") + geom_hline(yintercept = 8.98, color = "red")
+
+plot(gProv)
+
+library(egg)
+
+ggarrange(gPharma + theme(legend.position = "none"), gProv, nrow = 1)
+```
+
+```{r}
+##############################heat map##################################
+library(tidyverse)
+library(hrbrthemes)
+library(viridis)
+library(plotly)
+#devtools::install_github("rstudio/d3heatmap")
+library(d3heatmap)
+
+
+
+
+heat_map1 <- aggregate(org_frame_weightAll2[-9], by = list(org_frame_weightAll2$Org), FUN = "mean")
+
+heat_map1 <- heat_map1[-10]
+
+names(heat_map1)[1] <- "Org"
+
+heat_map2 <- heat_map1
+rownames(heat_map2) <- heat_map2[,1]
+heat_map2 <- heat_map2 %>% dplyr::select(-Org)
+heat_map2 <- as.matrix(heat_map2)
+
+orange_palette <- c("#ffffe5", "#fff7bc", "#fee391", "#fec44f", "#fe9929", "#ec7014", "#cc4c02", "#993404", "#662506")
+
+heat_map2_map <- d3heatmap(heat_map2, scale="column", dendrogram = "none", width="400px", height="1500px", colors = orange_palette)
+
+#saveWidget(heat_map2_map, file="heat_map2_map.html")
+
+heat_map3 <- aggregate(org_frame_weightAll2[-10], by = list(org_frame_weightAll2$Type), FUN = "mean")
+
+heat_map3 <- heat_map3[-10]
+
+names(heat_map3)[1] <- "Type"
+
+heat_map4 <- heat_map3
+rownames(heat_map4) <- heat_map4[,1]
+heat_map4 <- heat_map4 %>% dplyr::select(-Type)
+heat_map4 <- as.matrix(heat_map4)
+
+heat_map4_map <- d3heatmap(heat_map4, scale="column", dendrogram = "none", width="400px", height="100px", colors = "Blues")
+
+saveWidget(heat_map4_map, file="heat_map4_map.html")
+```
+
+```{r}
+##############################tree maps################################
+
+library(treemap)
+ 
+treemap1 <- heat_map1[-2]
+
+# Build Dataset
+uark2_num2 <- c(rep("group-1",4),rep("group-2",2),rep("group-3",3))
+query <- paste("subgroup" , c(1,2,3,4,1,2,1,2,3), sep="-")
+arktemp <- c(13,5,22,12,11,7,3,1,23)
+arktemp2 <- data.frame(uark2_num2,query,arktemp)
+ 
+# treemap
+treemap(arktemp2,
+            index=c("uark2_num2","query"),
+            vSize="arktemp",
+            type="index"
+            )
+
+treemap2 <- data.frame(c(rep(treemap1$Org, 7)))
+names(treemap2) <- "Org"
+treemap2 <- treemap2[order("Org")]
+
+treemap2_sub <- paste("" , colnames(treemap1[2:8]), sep="")
+
+treemap2_val <- data.frame(treemap1[2])
+
+for(i in 3:8) {
+  for(j in 1:157) {
+    treemap2_val <- rbind(treemap2_val, c(treemap1[i][j,]))
+  }
+}
+
+names(treemap2_val) <- "score"
+
+treemap2_sub2 <- data.frame("metric" = c(1:1099))
+
+treemap2_sub2$metric[1:157] <- treemap2_sub[1]
+treemap2_sub2$metric[158:314] <- treemap2_sub[2]
+treemap2_sub2$metric[315:471] <- treemap2_sub[3]
+treemap2_sub2$metric[472:628] <- treemap2_sub[4]
+treemap2_sub2$metric[629:785] <- treemap2_sub[5]
+treemap2_sub2$metric[786:942] <- treemap2_sub[6]
+treemap2_sub2$metric[943:1099] <- treemap2_sub[7]
+
+treemap2_full <- data.frame(treemap2, treemap2_sub2, treemap2_val)
+
+
+devtools::install_github("d3treeR/d3treeR")
+library(d3treeR)
+#remove.packages("d3treeR")
+
+
+
+treemap2_map <- treemap(treemap2_full,
+            index=c("Org","metric"),
+            vSize="score",
+            type="index",
+            palette = "Set1"
+            )
+
+treemap2_inter <- d3tree2(treemap2_map, rootname = "Org")
+
+#saveWidget(treemap2_inter, file="treemap2_inter.html")
+
+treemap3_full <- treemap2_full
+
+highMet <- data.frame("highMet" = c(1:nrow(treemap3_full)))
+
+treemap3_full <- cbind(treemap3_full, highMet)
+
+for(i in 1:nrow(treemap3_full)) {
+  treemap3_full$highMet[i] <- unique(subset(treemap3_full, Org == treemap3_full$Org[i] & score == max(subset(treemap3_full, Org == treemap3_full$Org[i])$score))$metric)
+}
+
+treemap3_full$highMet <- as.factor(treemap3_full$highMet)
+treemap3_map <- treemap(treemap3_full,
+            index=c("Org","metric"),
+            vSize="score",
+            vColor = "highMet",
+            type="categorical"
+            )
+
+treemap3_inter <- d3tree2(treemap3_map, rootname = "Org")
+
+saveWidget(treemap3_inter, file="treemap3_inter.html")
+```
+
+```{r}
+#######################tree map comparisons############################
+
+heat_map_blood <- heat_map1[c(5, 9, 17, 49, 64, 72, 80, 84, 87, 103, 112, 124, 154, 156),]
+
+heat_map_brain <- heat_map1[c(2, 3, 29, 37, 88, 125, 126, 131, 146, 153),]
+
+heat_map_diabetes <- heat_map1[c(11, 13, 18, 20, 30, 38, 47, 55, 57, 60, 71, 75, 76, 81, 105, 106, 121, 130, 134, 135, 145, 147),]
+
+heat_map_drugs <- heat_map1[c(4, 26, 28, 34, 39, 59, 65, 67, 128, 137, 144),]
+
+heat_map_heart <- heat_map1[c(6, 23, 61, 89, 111, 117, 120),]
+
+heat_map_immune <- heat_map1[c(14, 42, 70, 78, 82, 98, 99, 101, 118),]
+
+heat_map_infection <- heat_map1[c(1, 12, 15, 19, 21, 22, 24, 32, 33, 36, 45, 48, 50, 51, 53, 63, 66, 73, 77, 83, 86, 90, 91, 102, 108, 116, 119, 123, 127, 132, 140, 143, 148, 149, 152, 155, 157),]
+
+heat_map_organs <- heat_map1[c(10, 16, 27, 31, 43, 44, 46, 68, 79, 85, 97, 107, 109, 110, 114, 129, 138, 139, 150, 151),]
+
+heat_map_surgery <- heat_map1[c(8, 25, 41, 52, 56, 62, 69, 74, 100, 104, 113, 122, 133, 136, 141, 142),]
+
+
+#
+#blood
+#
+
+tree_map_blood <- data.frame(c(rep(heat_map_blood[-2]$Org, 7)))
+
+names(tree_map_blood) <- "Org"
+
+tree_map_blood_sub <- paste("" , colnames(heat_map_blood[3:9]), sep="")
+
+tree_map_blood_val <- data.frame(heat_map_blood[3])
+
+for(i in 3:8) {
+  for(j in 1:14) {
+    tree_map_blood_val <- rbind(tree_map_blood_val, c(heat_map_blood[-2][i][j,]))
+  }
+}
+
+names(tree_map_blood_val) <- "score"
+
+tree_map_blood_sub2 <- data.frame("metric" = c(1:98))
+
+tree_map_blood_sub2$metric[1:14] <- tree_map_blood_sub[1]
+tree_map_blood_sub2$metric[15:28] <- tree_map_blood_sub[2]
+tree_map_blood_sub2$metric[29:42] <- tree_map_blood_sub[3]
+tree_map_blood_sub2$metric[43:56] <- tree_map_blood_sub[4]
+tree_map_blood_sub2$metric[57:70] <- tree_map_blood_sub[5]
+tree_map_blood_sub2$metric[71:84] <- tree_map_blood_sub[6]
+tree_map_blood_sub2$metric[85:98] <- tree_map_blood_sub[7]
+
+tree_map_blood_full <- data.frame(tree_map_blood, tree_map_blood_sub2, tree_map_blood_val)
+
+tree_map_blood_map <- treemap(tree_map_blood_full,
+            index=c("Org","metric"),
+            vSize="score",
+            type="index",
+            palette = "Set1"
+            )
+
+
+#
+#brain
+#
+
+tree_map_brain <- data.frame(c(rep(heat_map_brain[-2]$Org, 7)))
+
+names(tree_map_brain) <- "Org"
+
+tree_map_brain_sub <- paste("" , colnames(heat_map_brain[3:9]), sep="")
+
+tree_map_brain_val <- data.frame(heat_map_brain[3])
+
+for(i in 3:8) {
+  for(j in 1:10) {
+    tree_map_brain_val <- rbind(tree_map_brain_val, c(heat_map_brain[-2][i][j,]))
+  }
+}
+
+names(tree_map_brain_val) <- "score"
+
+tree_map_brain_sub2 <- data.frame("metric" = c(1:70))
+
+tree_map_brain_sub2$metric[1:10] <- tree_map_brain_sub[1]
+tree_map_brain_sub2$metric[11:20] <- tree_map_brain_sub[2]
+tree_map_brain_sub2$metric[21:30] <- tree_map_brain_sub[3]
+tree_map_brain_sub2$metric[31:40] <- tree_map_brain_sub[4]
+tree_map_brain_sub2$metric[41:50] <- tree_map_brain_sub[5]
+tree_map_brain_sub2$metric[51:60] <- tree_map_brain_sub[6]
+tree_map_brain_sub2$metric[61:70] <- tree_map_brain_sub[7]
+
+tree_map_brain_full <- data.frame(tree_map_brain, tree_map_brain_sub2, tree_map_brain_val)
+
+tree_map_brain_map <- treemap(tree_map_brain_full,
+            index=c("Org","metric"),
+            vSize="score",
+            type="index",
+            palette = "Set1"
+            )
+
+
+#
+#diabetes
+#
+
+tree_map_diabetes <- data.frame(c(rep(heat_map_diabetes[-2]$Org, 7)))
+
+names(tree_map_diabetes) <- "Org"
+
+tree_map_diabetes_sub <- paste("" , colnames(heat_map_diabetes[3:9]), sep="")
+
+tree_map_diabetes_val <- data.frame(heat_map_diabetes[3])
+
+for(i in 3:8) {
+  for(j in 1:22) {
+    tree_map_diabetes_val <- rbind(tree_map_diabetes_val, c(heat_map_diabetes[-2][i][j,]))
+  }
+}
+
+names(tree_map_diabetes_val) <- "score"
+
+tree_map_diabetes_sub2 <- data.frame("metric" = c(1:154))
+
+tree_map_diabetes_sub2$metric[1:22] <- tree_map_diabetes_sub[1]
+tree_map_diabetes_sub2$metric[23:44] <- tree_map_diabetes_sub[2]
+tree_map_diabetes_sub2$metric[45:66] <- tree_map_diabetes_sub[3]
+tree_map_diabetes_sub2$metric[67:88] <- tree_map_diabetes_sub[4]
+tree_map_diabetes_sub2$metric[89:110] <- tree_map_diabetes_sub[5]
+tree_map_diabetes_sub2$metric[111:132] <- tree_map_diabetes_sub[6]
+tree_map_diabetes_sub2$metric[133:154] <- tree_map_diabetes_sub[7]
+
+tree_map_diabetes_full <- data.frame(tree_map_diabetes, tree_map_diabetes_sub2, tree_map_diabetes_val)
+
+tree_map_diabetes_map <- treemap(tree_map_diabetes_full,
+            index=c("Org","metric"),
+            vSize="score",
+            type="index",
+            palette = "Set1"
+            )
+
+
+#
+#drugs
+#
+
+tree_map_drugs <- data.frame(c(rep(heat_map_drugs[-2]$Org, 7)))
+
+names(tree_map_drugs) <- "Org"
+
+tree_map_drugs_sub <- paste("" , colnames(heat_map_drugs[3:9]), sep="")
+
+tree_map_drugs_val <- data.frame(heat_map_drugs[3])
+
+for(i in 3:8) {
+  for(j in 1:11) {
+    tree_map_drugs_val <- rbind(tree_map_drugs_val, c(heat_map_drugs[-2][i][j,]))
+  }
+}
+
+names(tree_map_drugs_val) <- "score"
+
+tree_map_drugs_sub2 <- data.frame("metric" = c(1:77))
+
+tree_map_drugs_sub2$metric[1:11] <- tree_map_drugs_sub[1]
+tree_map_drugs_sub2$metric[12:22] <- tree_map_drugs_sub[2]
+tree_map_drugs_sub2$metric[23:33] <- tree_map_drugs_sub[3]
+tree_map_drugs_sub2$metric[34:44] <- tree_map_drugs_sub[4]
+tree_map_drugs_sub2$metric[45:55] <- tree_map_drugs_sub[5]
+tree_map_drugs_sub2$metric[56:66] <- tree_map_drugs_sub[6]
+tree_map_drugs_sub2$metric[67:77] <- tree_map_drugs_sub[7]
+
+tree_map_drugs_full <- data.frame(tree_map_drugs, tree_map_drugs_sub2, tree_map_drugs_val)
+
+tree_map_drugs_map <- treemap(tree_map_drugs_full,
+            index=c("Org","metric"),
+            vSize="score",
+            type="index",
+            palette = "Set1"
+            )
+
+
+#
+#heart
+#
+
+tree_map_heart <- data.frame(c(rep(heat_map_heart[-2]$Org, 7)))
+
+names(tree_map_heart) <- "Org"
+
+tree_map_heart_sub <- paste("" , colnames(heat_map_heart[3:9]), sep="")
+
+tree_map_heart_val <- data.frame(heat_map_heart[3])
+
+for(i in 3:8) {
+  for(j in 1:7) {
+    tree_map_heart_val <- rbind(tree_map_heart_val, c(heat_map_heart[-2][i][j,]))
+  }
+}
+
+names(tree_map_heart_val) <- "score"
+
+tree_map_heart_sub2 <- data.frame("metric" = c(1:49))
+
+tree_map_heart_sub2$metric[1:7] <- tree_map_heart_sub[1]
+tree_map_heart_sub2$metric[8:14] <- tree_map_heart_sub[2]
+tree_map_heart_sub2$metric[15:21] <- tree_map_heart_sub[3]
+tree_map_heart_sub2$metric[22:28] <- tree_map_heart_sub[4]
+tree_map_heart_sub2$metric[29:35] <- tree_map_heart_sub[5]
+tree_map_heart_sub2$metric[36:42] <- tree_map_heart_sub[6]
+tree_map_heart_sub2$metric[43:49] <- tree_map_heart_sub[7]
+
+tree_map_heart_full <- data.frame(tree_map_heart, tree_map_heart_sub2, tree_map_heart_val)
+
+tree_map_heart_map <- treemap(tree_map_heart_full,
+            index=c("Org","metric"),
+            vSize="score",
+            type="index",
+            palette = "Set1"
+            )
+
+
+#
+#immune system
+#
+
+tree_map_immune <- data.frame(c(rep(heat_map_immune[-2]$Org, 7)))
+
+names(tree_map_immune) <- "Org"
+
+tree_map_immune_sub <- paste("" , colnames(heat_map_immune[3:9]), sep="")
+
+tree_map_immune_val <- data.frame(heat_map_immune[3])
+
+for(i in 3:8) {
+  for(j in 1:9) {
+    tree_map_immune_val <- rbind(tree_map_immune_val, c(heat_map_immune[-2][i][j,]))
+  }
+}
+
+names(tree_map_immune_val) <- "score"
+
+tree_map_immune_sub2 <- data.frame("metric" = c(1:63))
+
+tree_map_immune_sub2$metric[1:9] <- tree_map_immune_sub[1]
+tree_map_immune_sub2$metric[10:18] <- tree_map_immune_sub[2]
+tree_map_immune_sub2$metric[19:27] <- tree_map_immune_sub[3]
+tree_map_immune_sub2$metric[28:36] <- tree_map_immune_sub[4]
+tree_map_immune_sub2$metric[37:45] <- tree_map_immune_sub[5]
+tree_map_immune_sub2$metric[46:54] <- tree_map_immune_sub[6]
+tree_map_immune_sub2$metric[55:63] <- tree_map_immune_sub[7]
+
+tree_map_immune_full <- data.frame(tree_map_immune, tree_map_immune_sub2, tree_map_immune_val)
+
+tree_map_immune_map <- treemap(tree_map_immune_full,
+            index=c("Org","metric"),
+            vSize="score",
+            type="index",
+            palette = "Set1"
+            )
+
+#
+#infection
+#
+
+tree_map_infection <- data.frame(c(rep(heat_map_infection[-2]$Org, 7)))
+
+names(tree_map_infection) <- "Org"
+
+tree_map_infection_sub <- paste("" , colnames(heat_map_infection[3:9]), sep="")
+
+tree_map_infection_val <- data.frame(heat_map_infection[3])
+
+for(i in 3:8) {
+  for(j in 1:37) {
+    tree_map_infection_val <- rbind(tree_map_infection_val, c(heat_map_infection[-2][i][j,]))
+  }
+}
+
+names(tree_map_infection_val) <- "score"
+
+tree_map_infection_sub2 <- data.frame("metric" = c(1:259))
+
+tree_map_infection_sub2$metric[1:37] <- tree_map_infection_sub[1]
+tree_map_infection_sub2$metric[38:74] <- tree_map_infection_sub[2]
+tree_map_infection_sub2$metric[75:111] <- tree_map_infection_sub[3]
+tree_map_infection_sub2$metric[112:148] <- tree_map_infection_sub[4]
+tree_map_infection_sub2$metric[149:185] <- tree_map_infection_sub[5]
+tree_map_infection_sub2$metric[186:222] <- tree_map_infection_sub[6]
+tree_map_infection_sub2$metric[223:259] <- tree_map_infection_sub[7]
+
+tree_map_infection_full <- data.frame(tree_map_infection, tree_map_infection_sub2, tree_map_infection_val)
+
+tree_map_infection_map <- treemap(tree_map_infection_full,
+            index=c("Org","metric"),
+            vSize="score",
+            type="index",
+            palette = "Set1"
+            )
+
+#
+#organs
+#
+
+tree_map_organs <- data.frame(c(rep(heat_map_organs[-2]$Org, 7)))
+
+names(tree_map_organs) <- "Org"
+
+tree_map_organs_sub <- paste("" , colnames(heat_map_organs[3:9]), sep="")
+
+tree_map_organs_val <- data.frame(heat_map_organs[3])
+
+for(i in 3:8) {
+  for(j in 1:20) {
+    tree_map_organs_val <- rbind(tree_map_organs_val, c(heat_map_organs[-2][i][j,]))
+  }
+}
+
+names(tree_map_organs_val) <- "score"
+
+tree_map_organs_sub2 <- data.frame("metric" = c(1:140))
+
+tree_map_organs_sub2$metric[1:20] <- tree_map_organs_sub[1]
+tree_map_organs_sub2$metric[21:40] <- tree_map_organs_sub[2]
+tree_map_organs_sub2$metric[41:60] <- tree_map_organs_sub[3]
+tree_map_organs_sub2$metric[61:80] <- tree_map_organs_sub[4]
+tree_map_organs_sub2$metric[81:100] <- tree_map_organs_sub[5]
+tree_map_organs_sub2$metric[101:120] <- tree_map_organs_sub[6]
+tree_map_organs_sub2$metric[121:140] <- tree_map_organs_sub[7]
+
+tree_map_organs_full <- data.frame(tree_map_organs, tree_map_organs_sub2, tree_map_organs_val)
+
+tree_map_organs_map <- treemap(tree_map_organs_full,
+            index=c("Org","metric"),
+            vSize="score",
+            type="index",
+            palette = "Set1"
+            )
+
+
+#
+#surgery
+#
+
+tree_map_surgery <- data.frame(c(rep(heat_map_surgery[-2]$Org, 7)))
+
+names(tree_map_surgery) <- "Org"
+
+tree_map_surgery_sub <- paste("" , colnames(heat_map_surgery[3:9]), sep="")
+
+tree_map_surgery_val <- data.frame(heat_map_surgery[3])
+
+for(i in 3:8) {
+  for(j in 1:16) {
+    tree_map_surgery_val <- rbind(tree_map_surgery_val, c(heat_map_surgery[-2][i][j,]))
+  }
+}
+
+names(tree_map_surgery_val) <- "score"
+
+tree_map_surgery_sub2 <- data.frame("metric" = c(1:112))
+
+tree_map_surgery_sub2$metric[1:16] <- tree_map_surgery_sub[1]
+tree_map_surgery_sub2$metric[17:32] <- tree_map_surgery_sub[2]
+tree_map_surgery_sub2$metric[33:48] <- tree_map_surgery_sub[3]
+tree_map_surgery_sub2$metric[49:64] <- tree_map_surgery_sub[4]
+tree_map_surgery_sub2$metric[65:80] <- tree_map_surgery_sub[5]
+tree_map_surgery_sub2$metric[81:96] <- tree_map_surgery_sub[6]
+tree_map_surgery_sub2$metric[97:112] <- tree_map_surgery_sub[7]
+
+tree_map_surgery_full <- data.frame(tree_map_surgery, tree_map_surgery_sub2, tree_map_surgery_val)
+
+tree_map_surgery_map <- treemap(tree_map_surgery_full,
+            index=c("Org","metric"),
+            vSize="score",
+            type="index",
+            palette = "Set1"
+            )
+
+#
+#maps
+#
+
+tree_map_blood_map <- treemap(tree_map_blood_full,
+            index=c("Org","metric"),
+            vSize="score",
+            type="index",
+            palette = "Set1"
+            )
+
+tree_map_brain_map <- treemap(tree_map_brain_full,
+            index=c("Org","metric"),
+            vSize="score",
+            type="index",
+            palette = "Set1"
+            )
+
+tree_map_diabetes_map <- treemap(tree_map_diabetes_full,
+            index=c("Org","metric"),
+            vSize="score",
+            type="index",
+            palette = "Set1"
+            )
+
+tree_map_drugs_map <- treemap(tree_map_drugs_full,
+            index=c("Org","metric"),
+            vSize="score",
+            type="index",
+            palette = "Set1"
+            )
+
+tree_map_heart_map <- treemap(tree_map_heart_full,
+            index=c("Org","metric"),
+            vSize="score",
+            type="index",
+            palette = "Set1"
+            )
+
+tree_map_immune_map <- treemap(tree_map_immune_full,
+            index=c("Org","metric"),
+            vSize="score",
+            type="index",
+            palette = "Set1"
+            )
+
+tree_map_infection_map <- treemap(tree_map_infection_full,
+            index=c("Org","metric"),
+            vSize="score",
+            type="index",
+            palette = "Set1"
+            )
+
+tree_map_organs_map <- treemap(tree_map_organs_full,
+            index=c("Org","metric"),
+            vSize="score",
+            type="index",
+            palette = "Set1"
+            )
+
+tree_map_surgery_map <- treemap(tree_map_surgery_full,
+            index=c("Org","metric"),
+            vSize="score",
+            type="index",
+            palette = "Set1"
+            )
+```
+
+```{r}
+###########################concept name#################################
+
+#conName <- data.frame("conName" = c(""), "queryNum" = c(0))
+
+for(i in 1:length(med_org_met2)) {
+  for (j in 1:nrow(med_org_met2[[i]][[1]])) {
+    if (nrow(data.frame(lapply(med_org_met2[[i]][[1]]$Word[j], function(x) {
+        data.frame(str_extract_all(
+          x,
+          "(displayName([[:graph:]]+|( (?! )))+)|displayNameAge|displayNameMale[[:blank:]]\\W|displayNameFemale[[:blank:]]\\W"
+        ))
+    }))) == 0) {
+      
+    }
+    else {
+    tempframe <- data.frame(lapply(med_org_met2[[i]][[1]]$Word[j], function(x) {
+        data.frame(str_extract_all(
+          x,
+          "(displayName([[:graph:]]+|( (?! )))+)|displayNameAge|displayNameMale[[:blank:]]\\W|displayNameFemale[[:blank:]]\\W"
+        ))
+      }), c(i))
+    names(tempframe)[1] <- "conName"
+    names(tempframe)[2] <- "queryNum"
+    conName <-
+      rbind(conName, tempframe)
+    }
+  }
+}
+
+#conName <- subset(conName, queryNum != 0)
+
+orgName <- data.frame("orgName" = c(1:nrow(conName)))
+
+conName <- cbind(conName, orgName)
+
+for(i in 69301:nrow(conName)) {
+  conName$orgName[i] <- med_org_met2[[conName$queryNum[i]]][[7]]$Org[1]
+}
+
+appear <- data.frame("appear" = c(1:nrow(conName)))
+
+conName <- cbind(conName, appear)
+
+conName$appear <- 1
+
+conName2 <- aggregate(conName[4], by = list(conName$orgName, conName$conName), FUN = "sum")
+
+names(conName2) <- c("orgName", "conName", "appear")
+
+conName2 <- conName2[order(conName2$orgName, -conName2$appear),]
+
+conName3 <- data.frame("orgName", "conName", "appear")
+names(conName3) <- c("orgName", "conName", "appear")
+
+conName4 <- data.frame(unique(conName2$orgName))
+names(conName4) <- "orgName"
+
+for(i in 1:nrow(conName4)) {
+  if(nrow(subset(conName2, orgName == conName4$orgName[i])) < 5) {
+    conName3 <- rbind(conName3, subset(conName2, orgName == conName4$orgName[i]))
+  }
+  else {
+        conName3 <- rbind(conName3, subset(conName2, orgName == conName4$orgName[i])[1:5,])
+  }
+}
+
+conName3 <- subset(conName3, appear != "appear")
+
+conName3$appear <- as.numeric(conName3$appear)
+
+conName3$conName <- lapply(conName3$conName, function(x) {
+  gsub("displayName", "", x)
+})
+
+conName3$conName <- as.character(conName3$conName)
+```
